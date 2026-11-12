@@ -5,110 +5,198 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <title>Marché Prontera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --fond: #f6f5f2; --carte: #ffffff; --texte: #1d1d1f; --doux: #6b6b70; --ligne: #e3e1dc;
-  --accent: #b5562b; --accent-doux: #f3e3d9; --vert: #2f7d4f; --rouge: #b23b3b; --bleu: #2f5d9a;
+  --fond: #f4f2ee; --surface: #ffffff; --surface-2: #faf9f6; --texte: #1c1b19; --doux: #6e6a63; --tres-doux: #a19c93;
+  --ligne: #e6e2da; --accent: #c2622d; --accent-fond: #fbeee5; --vert: #2d7a4f; --vert-fond: #e5f3ea;
+  --rouge: #b03a3a; --rouge-fond: #f8e6e6; --bleu: #2c5b96; --bleu-fond: #e6eef8; --or: #a57a12; --or-fond: #f7efd9;
+  --ombre: 0 1px 2px rgba(30, 25, 15, .05), 0 4px 16px rgba(30, 25, 15, .05); --rayon: 12px;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --fond: #17171a; --carte: #222226; --texte: #ececee; --doux: #9b9ba3; --ligne: #34343a;
-          --accent: #e0875a; --accent-doux: #3a2a22; --vert: #5fbf86; --rouge: #e07070; --bleu: #79a4e0; }
+  :root:not([data-theme="light"]) {
+    --fond: #121214; --surface: #1b1b1f; --surface-2: #222227; --texte: #ecebe8; --doux: #a3a19b; --tres-doux: #6f6d68;
+    --ligne: #2e2e34; --accent: #e88a55; --accent-fond: #3a2519; --vert: #6cc48f; --vert-fond: #1c3326;
+    --rouge: #e47b7b; --rouge-fond: #3b2020; --bleu: #84aee6; --bleu-fond: #1d2a3d; --or: #e0b54d; --or-fond: #352b14;
+    --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  }
+}
+:root[data-theme="dark"] {
+  --fond: #121214; --surface: #1b1b1f; --surface-2: #222227; --texte: #ecebe8; --doux: #a3a19b; --tres-doux: #6f6d68;
+  --ligne: #2e2e34; --accent: #e88a55; --accent-fond: #3a2519; --vert: #6cc48f; --vert-fond: #1c3326;
+  --rouge: #e47b7b; --rouge-fond: #3b2020; --bleu: #84aee6; --bleu-fond: #1d2a3d; --or: #e0b54d; --or-fond: #352b14;
+  --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--fond); color: var(--texte); font: 15px/1.45 system-ui, "Segoe UI", sans-serif; }
-header { padding: 18px 20px 0; max-width: 1200px; margin: auto; }
-h1 { font-size: 22px; margin: 0 0 2px; letter-spacing: -0.01em; }
-.sous { color: var(--doux); font-size: 13px; }
-nav { display: flex; gap: 4px; margin-top: 14px; border-bottom: 1px solid var(--ligne); overflow-x: auto; }
-nav button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 9px 12px; font: inherit;
-  color: var(--doux); cursor: pointer; white-space: nowrap; }
-nav button.actif { color: var(--texte); border-color: var(--accent); font-weight: 600; }
-main { max-width: 1200px; margin: auto; padding: 16px 20px 60px; }
+html, body { margin: 0; background: var(--fond); color: var(--texte); }
+body { font: 14.5px/1.5 Inter, system-ui, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+.page { max-width: 1240px; margin: 0 auto; padding: 0 16px 80px; }
+
+/* ---- en-tete ---- */
+header { padding: 28px 0 18px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+.marque h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+.marque h1 span { color: var(--accent); }
+.marque p { margin: 4px 0 0; color: var(--doux); font-size: 13.5px; }
+.stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat { background: var(--surface); border: 1px solid var(--ligne); border-radius: 10px; padding: 8px 14px; box-shadow: var(--ombre); }
+.stat b { display: block; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat small { color: var(--doux); font-size: 12px; }
+
+/* ---- onglets ---- */
+nav { display: inline-flex; gap: 2px; background: var(--surface); border: 1px solid var(--ligne); border-radius: 11px; padding: 3px; box-shadow: var(--ombre); margin-bottom: 18px; max-width: 100%; overflow-x: auto; }
+nav button { border: 0; background: none; padding: 8px 16px; border-radius: 8px; color: var(--doux); font-weight: 500; cursor: pointer; white-space: nowrap; }
+nav button:hover { color: var(--texte); }
+nav button.actif { background: var(--accent); color: #fff; }
 .panneau { display: none; } .panneau.actif { display: block; }
-.barre { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
-input, select { font: inherit; color: var(--texte); background: var(--carte); border: 1px solid var(--ligne);
-  border-radius: 8px; padding: 7px 10px; min-width: 0; }
-input[type=number] { width: 90px; }
-button.bouton { font: inherit; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 7px 12px; cursor: pointer; }
-button.lien { background: none; border: 0; color: var(--bleu); cursor: pointer; font: inherit; padding: 0; text-align: left; }
-.filtre { display: flex; gap: 6px; align-items: center; background: var(--accent-doux); border-radius: 8px; padding: 4px 6px 4px 10px; }
-.filtre button { background: none; border: 0; color: var(--doux); cursor: pointer; font-size: 16px; }
-table { width: 100%; border-collapse: collapse; background: var(--carte); border-radius: 10px; overflow: hidden; }
-th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--ligne); vertical-align: top; }
-th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--doux); font-weight: 600; cursor: pointer; user-select: none; }
-td.prix, th.prix { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.affixes { font-size: 13px; color: var(--doux); }
-.affixes span { display: inline-block; margin-right: 8px; }
-.affixes span.match { color: var(--accent); font-weight: 600; }
-.etiquette { font-size: 11px; border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
-.e-vente { background: #2f7d4f22; color: var(--vert); } .e-vendu { background: #b23b3b22; color: var(--rouge); }
-.e-ancien { background: #8882; color: var(--doux); } .e-special { background: #2f5d9a22; color: var(--bleu); }
-.grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
-.shop { background: var(--carte); border: 1px solid var(--ligne); border-radius: 10px; padding: 10px 12px; }
-.shop h3 { margin: 0 0 6px; font-size: 15px; }
-.shop ul { list-style: none; margin: 0; padding: 0; font-size: 13px; }
-.shop li { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
-.chiffres { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 14px; }
-.chiffre { background: var(--carte); border: 1px solid var(--ligne); border-radius: 10px; padding: 8px 12px; min-width: 130px; }
-.chiffre b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
-.chiffre small { color: var(--doux); }
-.graph { background: var(--carte); border: 1px solid var(--ligne); border-radius: 10px; padding: 12px; height: 320px; margin-bottom: 14px; }
-.vide { color: var(--doux); padding: 30px; text-align: center; }
-svg.plan { background: var(--carte); border: 1px solid var(--ligne); border-radius: 10px; width: 100%; max-width: 420px; height: auto; }
-.cote { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 14px; align-items: start; }
-@media (max-width: 900px) { .cote { grid-template-columns: 1fr; } svg.plan { max-width: none; } }
-#verrou { position: fixed; inset: 0; background: var(--fond); display: none; align-items: center; justify-content: center; }
-#verrou form { background: var(--carte); border: 1px solid var(--ligne); border-radius: 12px; padding: 24px; display: grid; gap: 10px; width: min(340px, 90vw); }
+
+/* ---- champs ---- */
+input, select { font: inherit; color: var(--texte); background: var(--surface); border: 1px solid var(--ligne); border-radius: 9px; padding: 9px 12px; min-width: 0; outline: none; transition: border-color .15s; }
+input:focus, select:focus { border-color: var(--accent); }
+input[type=number] { width: 84px; }
+.champ-recherche { position: relative; flex: 1; min-width: 220px; }
+.champ-recherche input { width: 100%; padding-left: 36px; }
+.champ-recherche svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--tres-doux); }
+.barre { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.bouton { border: 0; background: var(--accent); color: #fff; border-radius: 9px; padding: 9px 14px; font-weight: 600; cursor: pointer; }
+.bouton.discret { background: var(--surface-2); color: var(--texte); border: 1px solid var(--ligne); }
+.lien { border: 0; background: none; padding: 0; color: inherit; cursor: pointer; text-align: left; font-weight: 600; }
+.lien:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---- etiquettes ---- */
+.puce { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.p-vente { background: var(--vert-fond); color: var(--vert); }
+.p-vendu { background: var(--rouge-fond); color: var(--rouge); }
+.p-ancien { background: var(--surface-2); color: var(--doux); border: 1px solid var(--ligne); }
+.p-special { background: var(--bleu-fond); color: var(--bleu); }
+.raff { display: inline-block; font-size: 12px; font-weight: 700; color: var(--or); background: var(--or-fond); border-radius: 6px; padding: 0 6px; margin-right: 6px; }
+.qte { color: var(--doux); font-weight: 500; margin-left: 4px; }
+.affixes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.affixe { font-size: 12px; background: var(--surface-2); border: 1px solid var(--ligne); color: var(--doux); border-radius: 6px; padding: 1px 7px; }
+.affixe.carte { color: var(--bleu); }
+.affixe.match { background: var(--accent-fond); border-color: transparent; color: var(--accent); font-weight: 600; }
+.prix { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; text-align: right; }
+.prix small { color: var(--doux); font-weight: 500; margin-left: 2px; }
+.meta { color: var(--doux); font-size: 12.5px; }
+
+/* ---- shops actuels ---- */
+.grille { columns: 3 320px; column-gap: 14px; }
+.shop { break-inside: avoid; background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); box-shadow: var(--ombre); margin-bottom: 14px; overflow: hidden; }
+.shop-tete { padding: 12px 14px 10px; border-bottom: 1px solid var(--ligne); }
+.shop-tete h3 { margin: 0 0 4px; font-size: 15px; font-weight: 650; line-height: 1.3; word-break: break-word; }
+.shop ul { list-style: none; margin: 0; padding: 4px 0; }
+.shop li { padding: 7px 14px; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; }
+.shop li + li { border-top: 1px dashed var(--ligne); }
+.shop li .meta { grid-column: 1 / -1; }
+
+/* ---- recherche ---- */
+.disposition { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .disposition { grid-template-columns: 1fr; } }
+.filtres { background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 16px; position: sticky; top: 12px; display: grid; gap: 14px; }
+.filtres label.titre { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); margin-bottom: 6px; }
+.filtres .ligne { display: flex; gap: 8px; }
+.filtres .ligne > :first-child { flex: 1; }
+.filtres input:not([type]), .filtres select, .filtres input[type=search] { width: 100%; }
+.actifs { display: flex; flex-wrap: wrap; gap: 6px; }
+.actif-f { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-fond); color: var(--accent); font-size: 12.5px; font-weight: 600; border-radius: 8px; padding: 4px 6px 4px 10px; }
+.actif-f button { border: 0; background: none; color: inherit; cursor: pointer; font-size: 15px; line-height: 1; padding: 0 2px; }
+.bascule { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--texte); }
+.resultats { display: grid; gap: 8px; }
+.resultat { background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; box-shadow: var(--ombre); }
+.resultat .bas { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.compte { color: var(--doux); font-size: 13px; margin: 0 0 10px; }
+
+/* ---- fiche objet ---- */
+.fiche-tete { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.fiche-tete h2 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
+.tuiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.tuile { background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); padding: 12px 14px; box-shadow: var(--ombre); }
+.tuile small { color: var(--doux); font-size: 12px; }
+.tuile b { display: block; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.graph { background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 14px; height: 340px; margin-bottom: 14px; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); overflow: hidden; box-shadow: var(--ombre); }
+th, td { padding: 10px 14px; border-bottom: 1px solid var(--ligne); text-align: left; vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); font-weight: 600; background: var(--surface-2); }
+.vide { color: var(--doux); text-align: center; padding: 48px 20px; background: var(--surface); border: 1px dashed var(--ligne); border-radius: var(--rayon); }
+.theme { border: 1px solid var(--ligne); background: var(--surface); border-radius: 9px; padding: 7px 10px; cursor: pointer; color: var(--doux); }
+
+/* ---- mot de passe ---- */
+#verrou { position: fixed; inset: 0; background: var(--fond); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+#verrou form { background: var(--surface); border: 1px solid var(--ligne); border-radius: 16px; box-shadow: var(--ombre); padding: 28px; width: min(360px, 100%); display: grid; gap: 12px; }
+#verrou h2 { margin: 0; font-size: 20px; }
+#verrou p { margin: 0; color: var(--doux); font-size: 13.5px; }
+#mdp-err { color: var(--rouge); font-size: 13px; min-height: 1em; }
 </style>
 </head>
 <body>
-<div id="verrou"><form id="form-mdp"><b>Mot de passe</b><input id="mdp" type="password" autocomplete="current-password"><button class="bouton">Ouvrir</button><small id="mdp-err" class="sous"></small></form></div>
-<header>
-  <h1>Marché de Prontera</h1>
-  <div class="sous" id="entete">Chargement…</div>
-  <nav>
-    <button data-p="actuels" class="actif">Shops actuels</button>
-    <button data-p="recherche">Recherche</button>
-    <button data-p="objet">Fiche objet</button>
-    <button data-p="affaires">Bonnes affaires</button>
-  </nav>
-</header>
-<main>
+<div id="verrou"><form id="form-mdp">
+  <h2>Marché de <span style="color:var(--accent)">Prontera</span></h2>
+  <p>Accès réservé. Entre le mot de passe.</p>
+  <input id="mdp" type="password" autocomplete="current-password" placeholder="Mot de passe">
+  <button class="bouton">Ouvrir</button><div id="mdp-err"></div>
+</form></div>
+
+<div class="page">
+  <header>
+    <div class="marque"><h1>Marché de <span>Prontera</span></h1><p id="entete">Chargement…</p></div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
+    <nav>
+      <button data-p="actuels" class="actif">Shops en vente</button>
+      <button data-p="recherche">Recherche</button>
+      <button data-p="objet">Fiche objet</button>
+    </nav>
+    <button class="theme" id="theme" title="Changer de thème">◐ Thème</button>
+  </div>
+
   <section class="panneau actif" id="p-actuels">
-    <div class="barre"><input id="f-shops" placeholder="Filtrer : titre du shop ou objet…" style="flex:1;min-width:220px"></div>
-    <div class="cote"><div class="grille" id="liste-shops"></div><svg class="plan" id="plan"></svg></div>
+    <div class="barre">
+      <div class="champ-recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="f-shops" type="search" placeholder="Filtrer par titre de shop ou par objet…"></div>
+      <select id="tri-shops"><option value="recent">Plus récents</option><option value="objets">Plus d'objets</option><option value="titre">Titre A → Z</option></select>
+    </div>
+    <div class="grille" id="liste-shops"></div>
   </section>
+
   <section class="panneau" id="p-recherche">
-    <div class="barre">
-      <input id="r-nom" list="noms" placeholder="Nom d'objet (vide = tous)" style="flex:1;min-width:220px">
-      <datalist id="noms"></datalist>
-      <label class="sous">Raffinage ≥ <input id="r-raff" type="number" min="0" max="20" value="0"></label>
-      <label class="sous"><input id="r-actuel" type="checkbox"> en vente seulement</label>
+    <div class="disposition">
+      <aside class="filtres">
+        <div><label class="titre" for="r-nom">Objet</label><input id="r-nom" type="search" list="noms" placeholder="Nom (vide = tous)"></div>
+        <datalist id="noms"></datalist>
+        <div><label class="titre" for="r-raff">Raffinage minimum</label><input id="r-raff" type="number" min="0" max="20" value="0"></div>
+        <div><label class="titre" for="r-type">Affixes</label>
+          <select id="r-type"><option value="">Choisir un type d'affixe…</option></select>
+          <div class="ligne" style="margin-top:8px"><input id="r-val" type="number" value="1" title="valeur minimale"><button class="bouton" id="r-ajout">Ajouter</button></div>
+          <div class="actifs" id="r-filtres" style="margin-top:10px"></div></div>
+        <label class="bascule"><input id="r-actuel" type="checkbox"> En vente actuellement</label>
+      </aside>
+      <div><p class="compte" id="r-compte"></p><div class="resultats" id="r-res"></div></div>
     </div>
-    <div class="barre">
-      <select id="r-type" style="flex:1;min-width:220px"><option value="">+ Ajouter un filtre d'affixe…</option></select>
-      <input id="r-val" type="number" placeholder="min" value="1"><button class="bouton" id="r-ajout">Ajouter</button>
-    </div>
-    <div class="barre" id="r-filtres"></div>
-    <div id="r-res"></div>
   </section>
+
   <section class="panneau" id="p-objet">
-    <div class="barre"><input id="o-nom" list="noms" placeholder="Choisir un objet…" style="flex:1;min-width:220px"></div>
-    <div id="o-contenu"><div class="vide">Choisis un objet (ou clique sur un nom dans les autres onglets).</div></div>
+    <div class="barre"><div class="champ-recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="o-nom" type="search" list="noms" placeholder="Choisir un objet…"></div></div>
+    <div id="o-contenu"><div class="vide">Choisis un objet, ou clique sur un nom d'objet dans les autres onglets.</div></div>
   </section>
-  <section class="panneau" id="p-affaires">
-    <p class="sous">Annonces actuelles au moins 25 % sous la médiane des prix vus pour le même objet (même raffinage, au moins 3 prix connus). Les équipements avec affixes se comparent mal : vérifie les affixes.</p>
-    <div id="a-res"></div>
-  </section>
-</main>
+</div>
+
 <script>
 "use strict";
-let D = null;                       // donnees brutes
+let D = null;
 const $ = s => document.querySelector(s);
-const z = n => n.toLocaleString("fr-FR") + " z";
+const nombre = n => Math.round(n).toLocaleString("fr-FR");
+const z = n => `${nombre(n)}<small>z</small>`;
+const court = n => n >= 1e6 ? (n / 1e6).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " M" : n >= 1e3 ? (n / 1e3).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " k" : String(n);
 const date = t => new Date(t * 1000).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-const jour = t => new Date(t * 1000).toISOString().slice(0, 10);
+const jour = t => { const d = new Date(t * 1000); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const ilya = t => { const s = Date.now() / 1000 - t; return s < 3600 ? `il y a ${Math.max(1, Math.round(s / 60))} min` : s < 86400 ? `il y a ${Math.round(s / 3600)} h` : `il y a ${Math.round(s / 86400)} j`; };
 const echap = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const nomObjet = id => (D.objets[id] || ["objet " + id])[0];
 const gabarit = id => D.options[id] || ("option " + id);
@@ -116,18 +204,19 @@ const texteOption = (id, v) => gabarit(id).replace("%d", v).replace("%%", "%");
 const typeOption = id => gabarit(id).replace("%d", "X").replace("%%", "%").trim();
 const mediane = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 
-// ---------- preparation ----------
-let OBS = {}, ANN = [], ACTUELS = new Set(), VENDUS = new Set();
+// ---------- preparation des donnees ----------
+let OBS = {}, ANN = [], ACTUELS = new Set(), VENDUS = new Set(), PERIODE = {}, DERNIERE_LECTURE = {};
 function preparer() {
-  for (const [id, aid, t, titre, x, y, special] of D.observations)
-    OBS[id] = { id, aid, t, titre, x: x || null, y: y || null, special, ou: x ? `(${x}, ${y})` : "position inconnue" };
+  for (const [id, aid, t, titre, x, y, special] of D.observations) {
+    OBS[id] = { id, aid, t, titre, special, ou: x ? `case ${x}, ${y}` : "position inconnue" };
+    DERNIERE_LECTURE[aid] = Math.max(DERNIERE_LECTURE[aid] || 0, t);
+  }
   ACTUELS = new Set(D.actuels);
-  // annonce : identite independante du prix pour suivre les ventes
   ANN = D.annonces.map(([obs, objet, prix, q, raff, cartes, options]) => ({ obs: OBS[obs], objet, prix, q, raff, cartes, options,
     sig: JSON.stringify([objet, raff, [...cartes].sort(), options.map(o => o[0] + ":" + o[1]).sort()]) }));
-  // une annonce d'une ancienne lecture dont la signature n'est plus dans la lecture suivante du meme shop = vendue
+  // vendu probable : la signature n'est plus dans la lecture suivante du meme shop
   const parShop = {};
-  for (const a of ANN) (parShop[a.obs.aid] ??= {})[a.obs.id] ??= [], parShop[a.obs.aid][a.obs.id].push(a);
+  for (const a of ANN) ((parShop[a.obs.aid] ??= {})[a.obs.id] ??= []).push(a);
   for (const lectures of Object.values(parShop)) {
     const ids = Object.keys(lectures).map(Number).sort((a, b) => OBS[a].t - OBS[b].t);
     for (let i = 0; i + 1 < ids.length; i++) {
@@ -135,171 +224,172 @@ function preparer() {
       for (const a of lectures[ids[i]]) if (!suivantes.has(a.sig)) VENDUS.add(a);
     }
   }
-  calculerPeriodes();
+  // periode de presence : premiere et derniere lecture du meme objet dans le meme shop
+  for (const a of ANN) {
+    const p = (PERIODE[a.obs.aid + "|" + a.sig] ??= { premier: a.obs.t, dernier: a.obs.t });
+    p.premier = Math.min(p.premier, a.obs.t); p.dernier = Math.max(p.dernier, a.obs.t);
+  }
   const noms = [...new Set(ANN.map(a => nomObjet(a.objet)))].sort((a, b) => a.localeCompare(b, "fr"));
   $("#noms").innerHTML = noms.map(n => `<option value="${echap(n)}">`).join("");
   const types = {};
   for (const a of ANN) for (const [id] of a.options) types[typeOption(id)] = 1;
   $("#r-type").innerHTML += Object.keys(types).sort((a, b) => a.localeCompare(b, "fr")).map(t => `<option>${echap(t)}</option>`).join("");
-  const n = D.actuels.length;
-  $("#entete").textContent = `Dernière tournée : ${date(D.derniere_tournee)} · ${n} shops vus · ${ANN.length} annonces en historique · ${D.ventes.length} ventes probables`;
+  const enVente = ANN.filter(a => ACTUELS.has(a.obs.id)).length;
+  $("#entete").textContent = `Dernière tournée ${ilya(D.derniere_tournee)} (${date(D.derniere_tournee)})`;
+  $("#stats").innerHTML = [[D.actuels.length, "shops en vente"], [enVente, "objets en vente"], [ANN.length, "annonces suivies"], [D.ventes.length, "ventes probables"]]
+    .map(([n, l]) => `<div class="stat"><b>${nombre(n)}</b><small>${l}</small></div>`).join("");
 }
-// periode de presence d'une annonce : premiere et derniere lecture du meme objet (meme signature) dans le meme shop
-let PERIODE = {};
-const clePeriode = a => a.obs.aid + "|" + a.sig;
-function calculerPeriodes() {
-  for (const a of ANN) {
-    const p = (PERIODE[clePeriode(a)] ??= { premier: a.obs.t, dernier: a.obs.t });
-    p.premier = Math.min(p.premier, a.obs.t); p.dernier = Math.max(p.dernier, a.obs.t);
-  }
-}
-const vue = a => { const p = PERIODE[clePeriode(a)];
-  return p.premier === p.dernier ? "vue le " + date(p.premier) : "vue du " + date(p.premier) + "<br>au " + date(p.dernier); };
-// disparition du shop APRES cette lecture (et pas de lecture plus recente) : fermeture, deconnexion ou absence
+const periode = a => PERIODE[a.obs.aid + "|" + a.sig];
+const vue = a => { const p = periode(a); return p.premier === p.dernier ? "vu le " + date(p.premier) : "vu du " + date(p.premier) + " au " + date(p.dernier); };
 const LIB_DISP = { ferme: "shop fermé", deconnexion: "vendeur déconnecté", absent: "shop absent" };
 function disparition(a) {
-  const plusRecente = Object.values(OBS).some(o => o.aid === a.obs.aid && o.t > a.obs.t);
-  if (plusRecente) return null;
+  if (DERNIERE_LECTURE[a.obs.aid] > a.obs.t) return null;
   return (D.disparitions || []).find(([aid, t]) => aid === a.obs.aid && t > a.obs.t) || null;
 }
-const statut = a => {
-  if (ACTUELS.has(a.obs.id)) return '<span class="etiquette e-vente">en vente</span>';
-  if (VENDUS.has(a)) return '<span class="etiquette e-vendu">vendu ?</span>';
+function statut(a) {
+  if (ACTUELS.has(a.obs.id)) return '<span class="puce p-vente">● en vente</span>';
+  if (VENDUS.has(a)) return '<span class="puce p-vendu">vendu ?</span>';
   const d = disparition(a);
-  if (d) return `<span class="etiquette e-ancien" title="${date(d[1])}">${LIB_DISP[d[2]] || "disparu"} le ${date(d[1])}</span>`;
-  return '<span class="etiquette e-ancien">ancien</span>';
-};
+  if (d) return `<span class="puce p-ancien">${LIB_DISP[d[2]] || "disparu"} le ${date(d[1])}</span>`;
+  return '<span class="puce p-ancien">ancienne annonce</span>';
+}
 const lienObjet = id => `<button class="lien" data-objet="${id}">${echap(nomObjet(id))}</button>`;
-function detailObjet(a, surligner = []) {
-  const aff = a.options.map(([id, v]) => `<span class="${surligner.includes(typeOption(id)) ? "match" : ""}">${echap(texteOption(id, v))}</span>`).join("");
-  const cartes = a.cartes.filter(c => D.objets[c]).map(c => `<span>🃏 ${echap(nomObjet(c))}</span>`).join("");
-  return (aff || cartes) ? `<div class="affixes">${aff}${cartes}</div>` : "";
+const nomComplet = (a, lien = true) => `${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${lien ? lienObjet(a.objet) : `<b>${echap(nomObjet(a.objet))}</b>`}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}`;
+function affixes(a, surligner = []) {
+  const opts = a.options.map(([id, v]) => `<span class="affixe${surligner.includes(typeOption(id)) ? " match" : ""}">${echap(texteOption(id, v))}</span>`);
+  const cartes = a.cartes.filter(c => D.objets[c]).map(c => `<span class="affixe carte">${echap(nomObjet(c))}</span>`);
+  return opts.length || cartes.length ? `<div class="affixes">${opts.join("")}${cartes.join("")}</div>` : "";
 }
 
-// ---------- shops actuels ----------
+// ---------- shops en vente ----------
 function afficherShops() {
-  const f = $("#f-shops").value.trim().toLowerCase();
-  const actuels = D.actuels.map(id => OBS[id]).sort((a, b) => b.t - a.t);
+  const f = $("#f-shops").value.trim().toLowerCase(), tri = $("#tri-shops").value;
   const parObs = {};
   for (const a of ANN) if (ACTUELS.has(a.obs.id)) (parObs[a.obs.id] ??= []).push(a);
-  const visibles = actuels.filter(o => !f || (o.titre || "").toLowerCase().includes(f) || (parObs[o.id] || []).some(a => nomObjet(a.objet).toLowerCase().includes(f)));
-  $("#liste-shops").innerHTML = visibles.map(o => `<div class="shop"><h3>${echap(o.titre)} ${o.special ? '<span class="etiquette e-special">durée limitée</span>' : ""}</h3>
-    <div class="sous">${o.ou} · lu ${date(o.t)}</div><ul>${(parObs[o.id] || []).map(a =>
-    `<li><span>${a.raff ? "+" + a.raff + " " : ""}${lienObjet(a.objet)}${a.q > 1 ? " ×" + a.q : ""}${PERIODE[clePeriode(a)].premier < a.obs.t ? '<div class="sous">depuis le ' + date(PERIODE[clePeriode(a)].premier) + "</div>" : ""}</span><span class="prix">${z(a.prix)}</span></li>`).join("")}</ul></div>`).join("")
-    || '<div class="vide">Aucun shop.</div>';
-  // plan : positions des shops
-  const pts = actuels.filter(o => o.x != null);
-  if (!pts.length) return;
-  const xs = pts.map(o => o.x), ys = pts.map(o => o.y);
-  const x0 = Math.min(...xs) - 3, x1 = Math.max(...xs) + 3, y0 = Math.min(...ys) - 3, y1 = Math.max(...ys) + 3;
-  const ids = new Set(visibles.map(o => o.id));
-  $("#plan").setAttribute("viewBox", `${x0} ${-y1} ${x1 - x0} ${y1 - y0}`);
-  $("#plan").innerHTML = pts.map(o => `<circle cx="${o.x}" cy="${-o.y}" r="${ids.has(o.id) ? 1.1 : 0.6}" fill="${ids.has(o.id) ? "var(--accent)" : "var(--ligne)"}"><title>${echap(o.titre)}</title></circle>`).join("");
+  let shops = D.actuels.map(id => OBS[id]).filter(o => !f || (o.titre || "").toLowerCase().includes(f)
+    || (parObs[o.id] || []).some(a => nomObjet(a.objet).toLowerCase().includes(f)));
+  shops.sort(tri === "titre" ? (a, b) => (a.titre || "").localeCompare(b.titre || "", "fr")
+    : tri === "objets" ? (a, b) => (parObs[b.id] || []).length - (parObs[a.id] || []).length : (a, b) => b.t - a.t);
+  $("#liste-shops").innerHTML = shops.map(o => `<article class="shop">
+      <div class="shop-tete"><h3>${echap(o.titre)}</h3>
+        <div class="meta">${o.special ? '<span class="puce p-special">durée limitée</span> ' : ""}${o.ou} · lu ${ilya(o.t)}</div></div>
+      <ul>${(parObs[o.id] || []).sort((a, b) => b.prix - a.prix).map(a => {
+        const p = periode(a), depuis = p.premier < a.obs.t ? `en vente depuis le ${date(p.premier)}` : "";
+        return `<li><span>${nomComplet(a)}</span><span class="prix">${z(a.prix)}</span>${a.options.length || a.cartes.some(c => D.objets[c]) ? `<div class="meta">${affixes(a)}</div>` : ""}${depuis ? `<div class="meta">${depuis}</div>` : ""}</li>`;
+      }).join("")}</ul></article>`).join("") || '<div class="vide">Aucun shop ne correspond.</div>';
 }
 
 // ---------- recherche ----------
-let filtres = [];   // [{type, min}]
+let filtres = [];
 function afficherFiltres() {
-  $("#r-filtres").innerHTML = filtres.map((f, i) => `<span class="filtre">${echap(f.type.replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}">×</button></span>`).join("");
+  $("#r-filtres").innerHTML = filtres.map((f, i) => `<span class="actif-f">${echap(f.type.replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}" title="Retirer">×</button></span>`).join("");
 }
 function rechercher() {
   const nom = $("#r-nom").value.trim().toLowerCase(), raff = +$("#r-raff").value || 0, actuel = $("#r-actuel").checked;
-  if (!nom && !filtres.length && !raff) { $("#r-res").innerHTML = '<div class="vide">Tape un nom ou ajoute un filtre d\'affixe.</div>'; return; }
-  let res = ANN.filter(a => (!nom || nomObjet(a.objet).toLowerCase().includes(nom)) && a.raff >= raff && (!actuel || ACTUELS.has(a.obs.id))
+  if (!nom && !filtres.length && !raff && !actuel) {
+    $("#r-compte").textContent = ""; $("#r-res").innerHTML = '<div class="vide">Tape un nom d\'objet ou ajoute un filtre d\'affixe.<br>La recherche couvre aussi les objets qui ne sont plus en vente.</div>'; return;
+  }
+  const res = ANN.filter(a => (!nom || nomObjet(a.objet).toLowerCase().includes(nom)) && a.raff >= raff && (!actuel || ACTUELS.has(a.obs.id))
     && filtres.every(f => a.options.some(([id, v]) => typeOption(id) === f.type && v >= f.min)));
-  // tri : valeur du 1er affixe filtre (decroissant), sinon prix croissant
+  // une seule ligne par objet suivi (meme shop, meme objet) : la lecture la plus recente
+  const uniques = {};
+  for (const a of res) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
+  const liste = Object.values(uniques);
   const f0 = filtres[0];
   const val = a => f0 ? Math.max(...a.options.filter(([id]) => typeOption(id) === f0.type).map(o => o[1])) : 0;
-  res.sort((a, b) => (val(b) - val(a)) || (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (a.prix - b.prix));
+  liste.sort((a, b) => (val(b) - val(a)) || (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (a.prix - b.prix));
   const types = filtres.map(f => f.type);
-  $("#r-res").innerHTML = `<p class="sous">${res.length} annonce(s)${res.length > 300 ? " — 300 premières affichées" : ""}</p>` + (res.length ? `<table><tr><th>Objet</th><th class="prix">Prix</th><th>Shop</th><th>Vue</th><th></th></tr>` +
-    res.slice(0, 300).map(a => `<tr><td>${a.raff ? "+" + a.raff + " " : ""}${lienObjet(a.objet)}${a.q > 1 ? " ×" + a.q : ""}${detailObjet(a, types)}</td>
-      <td class="prix">${z(a.prix)}</td><td>${echap(a.obs.titre)}<div class="sous">${a.obs.ou}</div></td><td class="sous">${vue(a)}</td><td>${statut(a)}</td></tr>`).join("") + "</table>" : "");
+  $("#r-compte").textContent = `${liste.length} résultat${liste.length > 1 ? "s" : ""}${liste.length > 200 ? " · 200 premiers affichés" : ""}`;
+  $("#r-res").innerHTML = liste.slice(0, 200).map(a => `<div class="resultat">
+      <div>${nomComplet(a)}${affixes(a, types)}</div><div class="prix">${z(a.prix)}</div>
+      <div class="bas">${statut(a)}<span class="meta">${echap(a.obs.titre)}</span><span class="meta">${vue(a)}</span></div></div>`).join("")
+    || '<div class="vide">Aucun résultat.</div>';
 }
 
 // ---------- fiche objet ----------
 let graphique = null;
 function ficheObjet(id) {
-  activer("objet"); $("#o-nom").value = nomObjet(id);
-  const anns = ANN.filter(a => a.objet === id);
-  const ventes = D.ventes.filter(v => v[2] === id);
+  activer("objet"); $("#o-nom").value = nomObjet(id); history.replaceState(null, "", "#objet=" + id);
+  const anns = ANN.filter(a => a.objet === id), ventes = D.ventes.filter(v => v[2] === id);
   if (!anns.length) { $("#o-contenu").innerHTML = '<div class="vide">Aucune annonce pour cet objet.</div>'; return; }
   const parJour = {};
-  for (const a of anns) { const j = (parJour[jour(a.obs.t)] ??= { prix: [], annonces: 0, ventes: 0 }); j.prix.push(a.prix); j.annonces++; }
-  for (const v of ventes) (parJour[jour(v[0])] ??= { prix: [], annonces: 0, ventes: 0 }).ventes += v[4];
+  const j0 = j => (parJour[j] ??= { prix: [], annonces: 0, ventes: 0 });
+  for (const a of anns) { const j = j0(jour(a.obs.t)); j.prix.push(a.prix); j.annonces++; }
+  for (const v of ventes) j0(jour(v[0])).ventes += v[4];
   const jours = Object.keys(parJour).sort();
   const actuels = anns.filter(a => ACTUELS.has(a.obs.id)), prixAct = actuels.map(a => a.prix), tous = anns.map(a => a.prix);
-  $("#o-contenu").innerHTML = `<div class="chiffres">
-    <div class="chiffre"><small>En vente maintenant</small><b>${actuels.length}</b></div>
-    <div class="chiffre"><small>Moins cher actuel</small><b>${prixAct.length ? z(Math.min(...prixAct)) : "—"}</b></div>
-    <div class="chiffre"><small>Médiane historique</small><b>${z(Math.round(mediane(tous)))}</b></div>
-    <div class="chiffre"><small>Plus cher vu</small><b>${z(Math.max(...tous))}</b></div>
-    <div class="chiffre"><small>Ventes probables</small><b>${ventes.reduce((s, v) => s + v[4], 0)}</b></div></div>
+  const nbVentes = ventes.reduce((s, v) => s + v[4], 0);
+  const tuile = (l, v) => `<div class="tuile"><small>${l}</small><b>${v}</b></div>`;
+  const uniques = {};
+  for (const a of anns) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
+  const liste = Object.values(uniques).sort((a, b) => (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (b.obs.t - a.obs.t));
+  $("#o-contenu").innerHTML = `<div class="fiche-tete"><h2>${echap(nomObjet(id))}</h2><span class="meta">${liste.length} annonce${liste.length > 1 ? "s" : ""} suivie${liste.length > 1 ? "s" : ""}</span></div>
+    <div class="tuiles">${tuile("En vente maintenant", actuels.length)}${tuile("Moins cher actuel", prixAct.length ? court(Math.min(...prixAct)) + " z" : "—")}
+      ${tuile("Prix médian (historique)", court(mediane(tous)) + " z")}${tuile("Fourchette vue", court(Math.min(...tous)) + " – " + court(Math.max(...tous)))}${tuile("Ventes probables", nbVentes)}</div>
     <div class="graph"><canvas id="o-graph"></canvas></div>
-    <table><tr><th>Objet</th><th class="prix">Prix</th><th>Shop</th><th>Vue</th><th></th></tr>${anns.sort((a, b) => b.obs.t - a.obs.t).map(a =>
-      `<tr><td>${a.raff ? "+" + a.raff + " " : ""}${echap(nomObjet(a.objet))}${a.q > 1 ? " ×" + a.q : ""}${detailObjet(a)}</td><td class="prix">${z(a.prix)}</td>
-       <td>${echap(a.obs.titre)}</td><td class="sous">${vue(a)}</td><td>${statut(a)}</td></tr>`).join("")}</table>`;
+    <table><tr><th>Objet</th><th style="text-align:right">Prix</th><th>Shop</th><th>Présence</th><th>Statut</th></tr>${liste.map(a =>
+      `<tr><td>${nomComplet(a, false)}${affixes(a)}</td><td class="prix">${z(a.prix)}</td><td>${echap(a.obs.titre)}</td><td class="meta">${vue(a)}</td><td>${statut(a)}</td></tr>`).join("")}</table>`;
   const css = getComputedStyle(document.documentElement), c = n => css.getPropertyValue(n).trim();
+  Chart.defaults.font.family = "Inter, system-ui, sans-serif";
   if (graphique) graphique.destroy();
   graphique = new Chart($("#o-graph"), {
-    data: { labels: jours, datasets: [
-      { type: "line", label: "Prix minimum", data: jours.map(j => parJour[j].prix.length ? Math.min(...parJour[j].prix) : null), borderColor: c("--accent"), backgroundColor: c("--accent"), yAxisID: "y", spanGaps: true, tension: 0.2 },
-      { type: "line", label: "Prix médian", data: jours.map(j => parJour[j].prix.length ? mediane(parJour[j].prix) : null), borderColor: c("--bleu"), backgroundColor: c("--bleu"), borderDash: [5, 4], yAxisID: "y", spanGaps: true, tension: 0.2 },
-      { type: "bar", label: "Annonces vues", data: jours.map(j => parJour[j].annonces), backgroundColor: c("--ligne"), yAxisID: "v" },
-      { type: "bar", label: "Ventes probables", data: jours.map(j => parJour[j].ventes), backgroundColor: c("--vert"), yAxisID: "v" } ] },
+    data: { labels: jours.map(j => j.slice(8, 10) + "/" + j.slice(5, 7)), datasets: [
+      { type: "line", label: "Prix minimum", data: jours.map(j => parJour[j].prix.length ? Math.min(...parJour[j].prix) : null), borderColor: c("--accent"), backgroundColor: c("--accent"), yAxisID: "y", spanGaps: true, tension: .25, pointRadius: 4, borderWidth: 2.5 },
+      { type: "line", label: "Prix médian", data: jours.map(j => parJour[j].prix.length ? mediane(parJour[j].prix) : null), borderColor: c("--bleu"), backgroundColor: c("--bleu"), borderDash: [6, 4], yAxisID: "y", spanGaps: true, tension: .25, pointRadius: 3, borderWidth: 2 },
+      { type: "bar", label: "Annonces vues", data: jours.map(j => parJour[j].annonces), backgroundColor: c("--ligne"), borderRadius: 4, yAxisID: "v", maxBarThickness: 28 },
+      { type: "bar", label: "Ventes probables", data: jours.map(j => parJour[j].ventes), backgroundColor: c("--vert"), borderRadius: 4, yAxisID: "v", maxBarThickness: 28 } ] },
     options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
-      plugins: { legend: { labels: { color: c("--texte") } }, tooltip: { callbacks: { label: x => x.dataset.label + " : " + (x.dataset.yAxisID === "y" ? z(Math.round(x.raw)) : x.raw) } } },
-      scales: { x: { ticks: { color: c("--doux") }, grid: { color: c("--ligne") } },
-        y: { position: "left", ticks: { color: c("--doux"), callback: v => v.toLocaleString("fr-FR") }, grid: { color: c("--ligne") } },
-        v: { position: "right", beginAtZero: true, ticks: { color: c("--doux"), precision: 0 }, grid: { display: false } } } } });
+      plugins: { legend: { position: "bottom", labels: { color: c("--doux"), usePointStyle: true, boxWidth: 8 } },
+        tooltip: { callbacks: { label: x => " " + x.dataset.label + " : " + (x.dataset.yAxisID === "y" ? nombre(x.raw) + " z" : x.raw) } } },
+      scales: { x: { ticks: { color: c("--doux") }, grid: { display: false } },
+        y: { position: "left", ticks: { color: c("--doux"), callback: v => court(v) }, grid: { color: c("--ligne") }, border: { display: false } },
+        v: { position: "right", beginAtZero: true, ticks: { color: c("--tres-doux"), precision: 0 }, grid: { display: false }, border: { display: false } } } } });
 }
 
-// ---------- bonnes affaires ----------
-function affaires() {
-  const ref = {};
-  for (const a of ANN) (ref[a.objet + "+" + a.raff] ??= []).push(a.prix);
-  const res = [];
-  for (const a of ANN) {
-    if (!ACTUELS.has(a.obs.id)) continue;
-    const p = ref[a.objet + "+" + a.raff];
-    if (p.length < 3) continue;
-    const m = mediane(p);
-    if (a.prix <= 0.75 * m) res.push([a, m]);
-  }
-  res.sort((x, y) => x[0].prix / x[1] - y[0].prix / y[1]);
-  $("#a-res").innerHTML = res.length ? `<table><tr><th>Objet</th><th class="prix">Prix</th><th class="prix">Médiane</th><th class="prix">Écart</th><th>Shop</th><th>Vue</th></tr>` + res.map(([a, m]) =>
-    `<tr><td>${a.raff ? "+" + a.raff + " " : ""}${lienObjet(a.objet)}${a.q > 1 ? " ×" + a.q : ""}${detailObjet(a)}</td><td class="prix">${z(a.prix)}</td><td class="prix">${z(Math.round(m))}</td>
-     <td class="prix" style="color:var(--vert)">−${Math.round(100 - 100 * a.prix / m)} %</td><td>${echap(a.obs.titre)}<div class="sous">${a.obs.ou}</div></td><td class="sous">${vue(a)}</td></tr>`).join("") + "</table>"
-    : '<div class="vide">Pas encore assez d\'historique pour repérer des bonnes affaires.</div>';
-}
-
-// ---------- navigation ----------
+// ---------- navigation, theme ----------
 function activer(p) {
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("actif", b.dataset.p === p));
   document.querySelectorAll(".panneau").forEach(s => s.classList.toggle("actif", s.id === "p-" + p));
   try { localStorage.setItem("onglet", p); } catch (e) {}
+  if (p !== "objet") history.replaceState(null, "", "#" + p);
 }
-document.querySelector("nav").onclick = e => { const p = e.target.dataset.p; if (p) { activer(p); if (p === "affaires") affaires(); } };
-document.body.addEventListener("click", e => { const id = e.target.dataset.objet; if (id) ficheObjet(+id); });
-$("#f-shops").oninput = afficherShops;
+// liens directs : #actuels, #recherche, #objet=<id> (partageables)
+function suivreLien() {
+  const h = location.hash.slice(1);
+  if (h.startsWith("objet=")) { ficheObjet(+h.slice(6)); return true; }
+  if (h.startsWith("recherche=")) { $("#r-nom").value = decodeURIComponent(h.slice(10)); activer("recherche"); rechercher(); return true; }
+  if (["actuels", "recherche"].includes(h)) { activer(h); return true; }
+  return false;
+}
+window.addEventListener("hashchange", () => D && suivreLien());
+document.querySelector("nav").onclick = e => { const p = e.target.dataset.p; if (p) activer(p); };
+document.body.addEventListener("click", e => { const b = e.target.closest("[data-objet]"); if (b) ficheObjet(+b.dataset.objet); });
+$("#f-shops").oninput = afficherShops; $("#tri-shops").onchange = afficherShops;
 ["#r-nom", "#r-raff", "#r-actuel"].forEach(s => $(s).oninput = rechercher);
 $("#r-ajout").onclick = () => { const t = $("#r-type").value; if (!t) return; filtres.push({ type: t, min: +$("#r-val").value || 0 }); $("#r-type").value = ""; afficherFiltres(); rechercher(); };
 $("#r-filtres").onclick = e => { const i = e.target.dataset.suppr; if (i != null) { filtres.splice(+i, 1); afficherFiltres(); rechercher(); } };
 $("#o-nom").onchange = () => { const n = $("#o-nom").value; const a = ANN.find(x => nomObjet(x.objet) === n); if (a) ficheObjet(a.objet); };
+function appliquerTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+try { appliquerTheme(localStorage.getItem("theme")); } catch (e) {}
+$("#theme").onclick = () => {
+  const sombre = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const t = sombre ? "light" : "dark"; appliquerTheme(t); try { localStorage.setItem("theme", t); } catch (e) {}
+  if (graphique && $("#o-nom").value) { const a = ANN.find(x => nomObjet(x.objet) === $("#o-nom").value); if (a) ficheObjet(a.objet); }
+};
 
-// ---------- chargement (donnees en clair en local, chiffrees une fois publiees) ----------
+// ---------- chargement (en clair en local, chiffre une fois publie) ----------
 async function dechiffrer(paquet, mdp) {
   const b = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
   const cle = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: b(paquet.sel), iterations: paquet.iterations, hash: "SHA-256" },
     await crypto.subtle.importKey("raw", new TextEncoder().encode(mdp), "PBKDF2", false, ["deriveKey"]),
     { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
-  const clair = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(paquet.iv) }, cle, b(paquet.donnees));
-  return JSON.parse(new TextDecoder().decode(clair));
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(paquet.iv) }, cle, b(paquet.donnees))));
 }
 function demarrer(donnees) {
   D = donnees; preparer(); afficherShops(); rechercher();
+  if (suivreLien()) return;
   let o = "actuels"; try { o = localStorage.getItem("onglet") || o; } catch (e) {}
-  activer(o === "objet" ? "recherche" : o); if (o === "affaires") affaires();
+  activer(["actuels", "recherche"].includes(o) ? o : "actuels");
 }
 (async () => {
   const r = await fetch("donnees/market.json", { cache: "no-store" });
@@ -310,7 +400,8 @@ function demarrer(donnees) {
   const essayer = async mdp => { try { demarrer(await dechiffrer(paquet, mdp)); $("#verrou").style.display = "none"; try { sessionStorage.setItem("mdp", mdp); } catch (e) {} return true; } catch (e) { return false; } };
   let m = null; try { m = sessionStorage.getItem("mdp"); } catch (e) {}
   if (m && await essayer(m)) return;
-  $("#form-mdp").onsubmit = async e => { e.preventDefault(); if (!await essayer($("#mdp").value)) $("#mdp-err").textContent = "Mot de passe incorrect."; };
+  $("#form-mdp").onsubmit = async e => { e.preventDefault(); $("#mdp-err").textContent = "";
+    if (!await essayer($("#mdp").value)) $("#mdp-err").textContent = "Mot de passe incorrect."; };
   $("#mdp").focus();
 })();
 </script>

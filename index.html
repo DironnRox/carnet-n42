@@ -155,8 +155,20 @@ function calculerPeriodes() {
 }
 const vue = a => { const p = PERIODE[clePeriode(a)];
   return p.premier === p.dernier ? "vue le " + date(p.premier) : "vue du " + date(p.premier) + "<br>au " + date(p.dernier); };
-const statut = a => ACTUELS.has(a.obs.id) ? '<span class="etiquette e-vente">en vente</span>'
-  : VENDUS.has(a) ? '<span class="etiquette e-vendu">vendu ?</span>' : '<span class="etiquette e-ancien">ancien</span>';
+// disparition du shop APRES cette lecture (et pas de lecture plus recente) : fermeture, deconnexion ou absence
+const LIB_DISP = { ferme: "shop fermé", deconnexion: "vendeur déconnecté", absent: "shop absent" };
+function disparition(a) {
+  const plusRecente = Object.values(OBS).some(o => o.aid === a.obs.aid && o.t > a.obs.t);
+  if (plusRecente) return null;
+  return (D.disparitions || []).find(([aid, t]) => aid === a.obs.aid && t > a.obs.t) || null;
+}
+const statut = a => {
+  if (ACTUELS.has(a.obs.id)) return '<span class="etiquette e-vente">en vente</span>';
+  if (VENDUS.has(a)) return '<span class="etiquette e-vendu">vendu ?</span>';
+  const d = disparition(a);
+  if (d) return `<span class="etiquette e-ancien" title="${date(d[1])}">${LIB_DISP[d[2]] || "disparu"} le ${date(d[1])}</span>`;
+  return '<span class="etiquette e-ancien">ancien</span>';
+};
 const lienObjet = id => `<button class="lien" data-objet="${id}">${echap(nomObjet(id))}</button>`;
 function detailObjet(a, surligner = []) {
   const aff = a.options.map(([id, v]) => `<span class="${surligner.includes(typeOption(id)) ? "match" : ""}">${echap(texteOption(id, v))}</span>`).join("");

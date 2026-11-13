@@ -135,6 +135,37 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 .ico.grand { width: 36px; height: 36px; margin-right: 10px; }
 .nom-objet { display: inline-flex; align-items: center; flex-wrap: wrap; }
 .outils { display: flex; gap: 8px; }
+
+.vue { display: none; } .vue.active { display: block; }
+.filtres { max-height: calc(100vh - 24px); overflow-y: auto; }
+.bloc { display: grid; gap: 8px; }
+.deux { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.deux input { width: 100%; }
+.segment { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border: 1px solid var(--ligne); border-radius: 9px; padding: 3px; }
+.segment button { border: 0; background: none; padding: 7px 8px; border-radius: 7px; cursor: pointer; color: var(--doux); font-weight: 500; }
+.segment button.actif { background: var(--accent); color: #fff; }
+.sauvees { display: flex; flex-wrap: wrap; gap: 6px; }
+.sauvee { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--ligne); background: var(--surface-2); border-radius: 8px; font-size: 12.5px; }
+.sauvee > button:first-child { border: 0; background: none; cursor: pointer; padding: 4px 4px 4px 10px; font-weight: 600; color: var(--texte); }
+.sauvee > button.x { border: 0; background: none; cursor: pointer; color: var(--tres-doux); padding: 0 8px 0 2px; font-size: 15px; }
+.sauvee.commune { border-color: transparent; background: var(--bleu-fond); }
+.sauvee.commune > button:first-child { color: var(--bleu); padding-right: 10px; }
+.actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.actions .bouton { padding: 7px 10px; font-size: 13px; }
+.petit { font-size: 12px; color: var(--doux); }
+.ligne-objet { background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); box-shadow: var(--ombre); }
+.ligne-objet .tete-ligne { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px 18px; align-items: center; padding: 11px 14px; }
+.ligne-objet .chiffres-l { display: flex; gap: 18px; align-items: baseline; text-align: right; }
+.ligne-objet .chiffres-l div small { display: block; color: var(--doux); font-size: 11.5px; font-weight: 500; }
+.ligne-objet .chiffres-l div b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.deplier { border: 1px solid var(--ligne); background: var(--surface-2); border-radius: 8px; padding: 5px 10px; cursor: pointer; color: var(--doux); white-space: nowrap; }
+.annonces-objet { border-top: 1px solid var(--ligne); padding: 6px 14px 10px; display: grid; gap: 6px; }
+.annonce { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; padding: 6px 0; border-bottom: 1px dashed var(--ligne); }
+.annonce:last-child { border-bottom: 0; }
+.annonce .bas { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
+.cat { font-size: 11.5px; color: var(--doux); }
+.retour { margin-bottom: 14px; }
+@media (max-width: 860px) { .filtres { max-height: none; position: static; } .ligne-objet .tete-ligne { grid-template-columns: 1fr; } .ligne-objet .chiffres-l { text-align: left; } }
 </style>
 </head>
 <body>
@@ -148,49 +179,55 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 <div class="page">
   <header>
     <div class="marque"><h1 data-t="titre_html"></h1><p id="entete"></p></div>
-    <div class="stats" id="stats"></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
+      <div class="stats" id="stats"></div>
+      <div class="outils"><button class="theme" id="langue" title="Language / Langue"></button><button class="theme" id="theme" data-t="theme"></button></div>
+    </div>
   </header>
 
-  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
-    <nav>
-      <button data-p="actuels" class="actif" data-t="onglet_shops"></button>
-      <button data-p="recherche" data-t="onglet_recherche"></button>
-      <button data-p="objet" data-t="onglet_objet"></button>
-    </nav>
-    <div class="outils">
-      <button class="theme" id="langue" title="Language / Langue"></button>
-      <button class="theme" id="theme" data-t="theme"></button>
-    </div>
-  </div>
-
-  <section class="panneau actif" id="p-actuels">
-    <div class="barre">
-      <div class="champ-recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="f-shops" type="search" data-tp="filtre_shops"></div>
-      <select id="tri-shops"><option value="recent" data-t="tri_recent"></option><option value="objets" data-t="tri_objets"></option><option value="titre" data-t="tri_titre"></option></select>
-    </div>
-    <div class="grille" id="liste-shops"></div>
-  </section>
-
-  <section class="panneau" id="p-recherche">
+  <!-- ===================== MARKET (recherche) ===================== -->
+  <section class="vue active" id="vue-market">
     <div class="disposition">
       <aside class="filtres">
+        <div class="bloc">
+          <label class="titre" data-t="sauvees"></label>
+          <div class="sauvees" id="sauvees"></div>
+          <div class="actions">
+            <button class="bouton" id="b-sauver" data-t="sauver"></button>
+            <button class="bouton discret" id="b-lien" data-t="copier_lien"></button>
+            <button class="bouton discret" id="b-reset" data-t="reset"></button>
+          </div>
+          <form id="f-sauver" style="display:none" class="ligne"><input id="nom-sauver" data-tp="nom_recherche"><button class="bouton" data-t="ok"></button></form>
+          <span class="petit" id="msg-lien"></span>
+        </div>
         <div><label class="titre" for="r-nom" data-t="objet"></label><input id="r-nom" type="search" list="noms" data-tp="nom_vide"></div>
         <datalist id="noms"></datalist>
-        <div><label class="titre" for="r-raff" data-t="raff_min"></label><input id="r-raff" type="number" min="0" max="20" value="0"></div>
-        <div><label class="titre" for="r-type" data-t="affixes"></label>
+        <div class="bloc"><label class="titre" for="r-groupe" data-t="categorie"></label>
+          <select id="r-groupe"></select><select id="r-sous"></select></div>
+        <div class="deux">
+          <div><label class="titre" for="r-raff" data-t="raff_min"></label><input id="r-raff" type="number" min="0" max="20" value="0"></div>
+          <div><label class="titre" data-t="emplacements"></label><select id="r-slots"><option value="">—</option><option value="1">≥ 1</option><option value="2">≥ 2</option><option value="3">≥ 3</option><option value="4">4</option></select></div>
+        </div>
+        <div><label class="titre" data-t="prix"></label>
+          <div class="deux"><input id="r-pmin" data-tp="prix_min"><input id="r-pmax" data-tp="prix_max"></div></div>
+        <div class="bloc"><label class="titre" for="r-type" data-t="affixes"></label>
           <select id="r-type"></select>
-          <div class="ligne" style="margin-top:8px"><input id="r-val" type="number" value="1"><button class="bouton" id="r-ajout" data-t="ajouter"></button></div>
-          <div class="actifs" id="r-filtres" style="margin-top:10px"></div></div>
-        <label class="bascule"><input id="r-actuel" type="checkbox"> <span data-t="en_vente_seul"></span></label>
+          <div class="ligne"><input id="r-val" type="number" value="1"><button class="bouton" id="r-ajout" data-t="ajouter"></button></div>
+          <div class="actifs" id="r-filtres"></div>
+          <span class="petit" data-t="affixes_aide"></span></div>
+        <label class="bascule"><input id="r-actuel" type="checkbox" checked> <span data-t="en_vente_seul"></span></label>
+        <div class="bloc"><label class="titre" data-t="affichage"></label>
+          <div class="segment"><button data-mode="objet" data-t="par_objet"></button><button data-mode="annonce" data-t="par_annonce"></button></div></div>
+        <div><label class="titre" for="r-tri" data-t="trier"></label>
+          <select id="r-tri"><option value="prix" data-t="tri_prix"></option><option value="prix_desc" data-t="tri_prix_desc"></option><option value="recent" data-t="tri_recent"></option><option value="affixe" data-t="tri_affixe"></option><option value="nom" data-t="tri_nom"></option></select></div>
       </aside>
       <div><p class="compte" id="r-compte"></p><div class="resultats" id="r-res"></div></div>
     </div>
   </section>
 
-  <section class="panneau" id="p-objet">
-    <div class="barre"><div class="champ-recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="o-nom" type="search" list="noms" data-tp="choisir_objet"></div></div>
+  <!-- ===================== FICHE OBJET ===================== -->
+  <section class="vue" id="vue-objet">
+    <button class="bouton discret retour" id="b-retour" data-t="retour"></button>
     <div id="o-contenu"></div>
   </section>
 </div>
@@ -202,27 +239,38 @@ const T = {
   titre_html: ["Prontera <span>Market</span>", "Marché de <span>Prontera</span>"],
   acces: ["Private access. Enter the password.", "Accès réservé. Entre le mot de passe."],
   mdp: ["Password", "Mot de passe"], ouvrir: ["Open", "Ouvrir"], mdp_faux: ["Wrong password.", "Mot de passe incorrect."],
-  onglet_shops: ["Shops", "Shops en vente"], onglet_recherche: ["Search", "Recherche"], onglet_objet: ["Item", "Fiche objet"],
   theme: ["◐ Theme", "◐ Thème"],
-  filtre_shops: ["Filter by shop title or item…", "Filtrer par titre de shop ou par objet…"],
-  tri_recent: ["Most recent", "Plus récents"], tri_objets: ["Most items", "Plus d'objets"], tri_titre: ["Title A → Z", "Titre A → Z"],
-  objet: ["Item", "Objet"], nom_vide: ["Name (empty = all)", "Nom (vide = tous)"], raff_min: ["Minimum refine", "Raffinage minimum"],
+  sauvees: ["Saved searches", "Recherches enregistrées"], sauver: ["★ Save", "★ Enregistrer"], copier_lien: ["🔗 Copy link", "🔗 Copier le lien"],
+  reset: ["Reset", "Réinitialiser"], nom_recherche: ["Name of this search", "Nom de cette recherche"], ok: ["OK", "OK"],
+  aucune_sauvee: ["None yet: set filters, then ★ Save.", "Aucune pour l'instant : règle les filtres puis ★ Enregistrer."],
+  lien_copie: ["Link copied: paste it to share this search.", "Lien copié : colle-le pour partager cette recherche."],
+  commune: ["Shared with the group", "Commune au groupe"], supprimer: ["Delete", "Supprimer"],
+  objet: ["Item", "Objet"], nom_vide: ["Name (empty = all)", "Nom (vide = tous)"],
+  categorie: ["Category", "Catégorie"], toutes_cat: ["All categories", "Toutes les catégories"], tous_types: ["All types", "Tous les types"],
+  g_arme: ["Weapons", "Armes"], g_armure: ["Armors", "Armures"], g_tete: ["Headgears", "Couvre-chefs"], g_cape: ["Garments", "Capes"],
+  g_chaussures: ["Shoes", "Chaussures"], g_bouclier: ["Shields", "Boucliers"], g_accessoire: ["Accessories", "Accessoires"],
+  g_carte: ["Cards", "Cartes"], g_costume: ["Costumes", "Costumes"], g_familier: ["Pets & eggs", "Œufs et familiers"],
+  g_divers: ["Consumables & materials", "Consommables et matériaux"],
+  raff_min: ["Min. refine", "Raffinage min."], emplacements: ["Card slots", "Emplacements"],
+  prix: ["Price (e.g. 200k, 1.5m)", "Prix (ex. 200k, 1,5m)"], prix_min: ["min", "min"], prix_max: ["max", "max"],
   affixes: ["Random options", "Affixes"], choisir_type: ["Choose an option type…", "Choisir un type d'affixe…"],
-  ajouter: ["Add", "Ajouter"], en_vente_seul: ["Currently for sale", "En vente actuellement"],
-  choisir_objet: ["Pick an item…", "Choisir un objet…"],
-  fiche_vide: ["Pick an item, or click an item name in the other tabs.", "Choisis un objet, ou clique sur un nom d'objet dans les autres onglets."],
+  affixes_aide: ["Only options seen on items of the selected category are listed.", "Seuls les affixes vus sur les objets de la catégorie choisie sont proposés."],
+  ajouter: ["Add", "Ajouter"], en_vente_seul: ["Currently for sale only", "En vente actuellement seulement"],
+  affichage: ["Display", "Affichage"], par_objet: ["By item", "Par objet"], par_annonce: ["All listings", "Toutes les annonces"],
+  trier: ["Sort by", "Trier par"], tri_prix: ["Price ↑", "Prix ↑"], tri_prix_desc: ["Price ↓", "Prix ↓"], tri_recent: ["Most recent", "Plus récent"],
+  tri_affixe: ["1st option value ↓", "Valeur du 1er affixe ↓"], tri_nom: ["Name A → Z", "Nom A → Z"],
+  retour: ["← Back to search", "← Retour à la recherche"],
   derniere: ["Last run {0} ({1})", "Dernière tournée {0} ({1})"],
   st_shops: ["shops open", "shops en vente"], st_objets: ["items for sale", "objets en vente"],
   st_annonces: ["tracked listings", "annonces suivies"], st_ventes: ["likely sales", "ventes probables"],
   il_y_a_min: ["{0} min ago", "il y a {0} min"], il_y_a_h: ["{0} h ago", "il y a {0} h"], il_y_a_j: ["{0} d ago", "il y a {0} j"],
-  case_: ["cell {0}, {1}", "case {0}, {1}"], pos_inconnue: ["unknown position", "position inconnue"],
-  lu: ["read {0}", "lu {0}"], duree: ["limited time", "durée limitée"], depuis: ["for sale since {0}", "en vente depuis le {0}"],
-  aucun_shop: ["No matching shop.", "Aucun shop ne correspond."],
   en_vente: ["● for sale", "● en vente"], vendu: ["sold?", "vendu ?"], ancienne: ["old listing", "ancienne annonce"],
   ferme: ["shop closed {0}", "shop fermé le {0}"], deconnexion: ["vendor logged out {0}", "vendeur déconnecté le {0}"], absent: ["shop gone {0}", "shop absent le {0}"],
   vu_le: ["seen {0}", "vu le {0}"], vu_du: ["seen {0} → {1}", "vu du {0} au {1}"],
-  recherche_vide: ["Type an item name or add an option filter.<br>Search also covers items no longer for sale.", "Tape un nom d'objet ou ajoute un filtre d'affixe.<br>La recherche couvre aussi les objets qui ne sont plus en vente."],
-  resultats: ["{0} result(s)", "{0} résultat(s)"], premiers: [" · first 200 shown", " · 200 premiers affichés"], aucun_resultat: ["No results.", "Aucun résultat."],
+  resultats_objets: ["{0} item(s) · {1} listing(s)", "{0} objet(s) · {1} annonce(s)"], premiers: [" · first 200 shown", " · 200 premiers affichés"],
+  aucun_resultat: ["No results. Try removing a filter, or untick “currently for sale” to search the history.", "Aucun résultat. Retire un filtre, ou décoche « en vente » pour chercher dans l'historique."],
+  en_vente_n: ["for sale", "en vente"], vus_n: ["listings", "annonces"], moins_cher: ["cheapest", "moins cher"], mediane: ["median", "médiane"],
+  voir: ["▸ {0} listing(s)", "▸ {0} annonce(s)"], masquer: ["▾ hide", "▾ masquer"],
   aucune_annonce: ["No listing for this item.", "Aucune annonce pour cet objet."], annonces_suivies: ["{0} tracked listing(s)", "{0} annonce(s) suivie(s)"],
   t_vente: ["For sale now", "En vente maintenant"], t_moins_cher: ["Cheapest now", "Moins cher actuel"], t_mediane: ["Median price (history)", "Prix médian (historique)"],
   t_fourchette: ["Price range seen", "Fourchette vue"], t_ventes: ["Likely sales", "Ventes probables"],
@@ -230,10 +278,12 @@ const T = {
   c_objet: ["Item", "Objet"], c_prix: ["Price", "Prix"], c_presence: ["Seen", "Présence"], c_statut: ["Status", "Statut"],
   donnees_absentes: ["Data not found.", "Données introuvables."], chargement: ["Loading…", "Chargement…"],
 };
-let LANGUE = 0;                                     // 0 = anglais (defaut), 1 = francais
+const GROUPES = ["arme", "armure", "tete", "cape", "chaussures", "bouclier", "accessoire", "carte", "costume", "familier", "divers"];
+let LANGUE = 0;
 try { LANGUE = localStorage.getItem("langue") === "fr" ? 1 : 0; } catch (e) {}
 if (/[?&]lang=fr/.test(location.search)) LANGUE = 1;
 if (/[?&]lang=en/.test(location.search)) LANGUE = 0;
+const $ = s => document.querySelector(s);
 const t = (cle, ...a) => (T[cle] ? T[cle][LANGUE] : cle).replace(/\{(\d)\}/g, (_, i) => a[+i]);
 const LOCALE = () => LANGUE ? "fr-FR" : "en-GB";
 function traduirePage() {
@@ -245,7 +295,6 @@ function traduirePage() {
 }
 
 let D = null;
-const $ = s => document.querySelector(s);
 const nombre = n => Math.round(n).toLocaleString(LOCALE());
 const z = n => `${nombre(n)}<small>z</small>`;
 const court = n => n >= 1e6 ? (n / 1e6).toLocaleString(LOCALE(), { maximumFractionDigits: 2 }) + " M" : n >= 1e3 ? (n / 1e3).toLocaleString(LOCALE(), { maximumFractionDigits: 1 }) + " k" : String(n);
@@ -253,14 +302,26 @@ const date = ts => new Date(ts * 1000).toLocaleString(LOCALE(), { day: "2-digit"
 const jour = ts => { const d = new Date(ts * 1000); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const ilya = ts => { const s = Date.now() / 1000 - ts; return s < 3600 ? t("il_y_a_min", Math.max(1, Math.round(s / 60))) : s < 86400 ? t("il_y_a_h", Math.round(s / 3600)) : t("il_y_a_j", Math.round(s / 86400)); };
 const echap = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const nomObjet = id => (D.objets[id] || [])[LANGUE] || ((LANGUE ? "objet " : "item ") + id);
+const infoObjet = id => D.objets[id] || [];
+const nomObjet = id => infoObjet(id)[LANGUE] || ((LANGUE ? "objet " : "item ") + id);
+const groupeObjet = id => infoObjet(id)[4] || "divers";
+const sousType = id => infoObjet(id)[5] || "";
+const libSousType = id => infoObjet(id)[LANGUE ? 6 : 5] || "";
+const slotsObjet = id => infoObjet(id)[3] || 0;
 const gabarit = id => (D.options[id] || [])[LANGUE] || ("option " + id);
 const texteOption = (id, v) => gabarit(id).replace("%d", v).replace("%%", "%");
 const typeOption = id => gabarit(id).replace("%d", "X").replace("%%", "%").trim();
 const icone = (id, grand) => `<img class="ico${grand ? " grand" : ""}" src="icones/${id}.png" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
 const mediane = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+// « 200k », « 1.5m », « 1,5 M », « 1 000 000 » -> nombre
+function lirePrix(s) {
+  s = String(s || "").trim().toLowerCase().replace(/\s/g, "").replace(",", ".");
+  if (!s) return null;
+  const m = s.match(/^([0-9.]+)([km]?)/); if (!m) return null;
+  return parseFloat(m[1]) * (m[2] === "m" ? 1e6 : m[2] === "k" ? 1e3 : 1);
+}
 
-// ---------- preparation des donnees ----------
+// ---------- donnees ----------
 let OBS = {}, ANN = [], ACTUELS = new Set(), VENDUS = new Set(), PERIODE = {}, DERNIERE_LECTURE = {};
 function preparer() {
   for (const [id, aid, ts, titre, x, y, special] of D.observations) {
@@ -284,19 +345,6 @@ function preparer() {
     p.premier = Math.min(p.premier, a.obs.t); p.dernier = Math.max(p.dernier, a.obs.t);
   }
 }
-// textes qui dependent de la langue (liste de noms, types d'affixes, en-tete)
-function textesLangue() {
-  const noms = [...new Set(ANN.map(a => nomObjet(a.objet)))].sort((a, b) => a.localeCompare(b, LOCALE()));
-  $("#noms").innerHTML = noms.map(n => `<option value="${echap(n)}">`).join("");
-  const types = {};
-  for (const a of ANN) for (const [id] of a.options) types[typeOption(id)] = 1;
-  $("#r-type").innerHTML = `<option value="">${t("choisir_type")}</option>` + Object.keys(types).sort((a, b) => a.localeCompare(b, LOCALE())).map(x => `<option>${echap(x)}</option>`).join("");
-  const enVente = ANN.filter(a => ACTUELS.has(a.obs.id)).length;
-  $("#entete").textContent = t("derniere", ilya(D.derniere_tournee), date(D.derniere_tournee));
-  $("#stats").innerHTML = [[D.actuels.length, "st_shops"], [enVente, "st_objets"], [ANN.length, "st_annonces"], [D.ventes.length, "st_ventes"]]
-    .map(([n, l]) => `<div class="stat"><b>${nombre(n)}</b><small>${t(l)}</small></div>`).join("");
-}
-const ou = o => o.x ? t("case_", o.x, o.y) : t("pos_inconnue");
 const periode = a => PERIODE[a.obs.aid + "|" + a.sig];
 const vue = a => { const p = periode(a); return p.premier === p.dernier ? t("vu_le", date(p.premier)) : t("vu_du", date(p.premier), date(p.dernier)); };
 function disparition(a) {
@@ -318,53 +366,124 @@ function affixes(a, surligner = []) {
   return opts.length || cartes.length ? `<div class="affixes">${opts.join("")}${cartes.join("")}</div>` : "";
 }
 
-// ---------- shops en vente ----------
-function afficherShops() {
-  const f = $("#f-shops").value.trim().toLowerCase(), tri = $("#tri-shops").value;
-  const parObs = {};
-  for (const a of ANN) if (ACTUELS.has(a.obs.id)) (parObs[a.obs.id] ??= []).push(a);
-  let shops = D.actuels.map(id => OBS[id]).filter(o => !f || (o.titre || "").toLowerCase().includes(f)
-    || (parObs[o.id] || []).some(a => nomObjet(a.objet).toLowerCase().includes(f)));
-  shops.sort(tri === "titre" ? (a, b) => (a.titre || "").localeCompare(b.titre || "", LOCALE())
-    : tri === "objets" ? (a, b) => (parObs[b.id] || []).length - (parObs[a.id] || []).length : (a, b) => b.t - a.t);
-  $("#liste-shops").innerHTML = shops.map(o => `<article class="shop">
-      <div class="shop-tete"><h3>${echap(o.titre)}</h3>
-        <div class="meta">${o.special ? `<span class="puce p-special">${t("duree")}</span> ` : ""}${ou(o)} · ${t("lu", ilya(o.t))}</div></div>
-      <ul>${(parObs[o.id] || []).sort((a, b) => b.prix - a.prix).map(a => {
-        const p = periode(a), depuis = p.premier < a.obs.t ? t("depuis", date(p.premier)) : "";
-        return `<li><span>${nomComplet(a)}</span><span class="prix">${z(a.prix)}</span>${a.options.length || a.cartes.some(c => D.objets[c]) ? `<div class="meta">${affixes(a)}</div>` : ""}${depuis ? `<div class="meta">${depuis}</div>` : ""}</li>`;
-      }).join("")}</ul></article>`).join("") || `<div class="vide">${t("aucun_shop")}</div>`;
+// ---------- etat de la recherche (serialisable : lien partageable et recherches enregistrees) ----------
+const ETAT_VIDE = { nom: "", groupe: "", sous: "", raff: 0, slots: "", pmin: "", pmax: "", filtres: [], actuel: true, mode: "objet", tri: "prix" };
+let S = JSON.parse(JSON.stringify(ETAT_VIDE));
+const deplies = new Set();
+function lireFormulaire() {
+  S.nom = $("#r-nom").value.trim(); S.groupe = $("#r-groupe").value; S.sous = $("#r-sous").value;
+  S.raff = +$("#r-raff").value || 0; S.slots = $("#r-slots").value; S.pmin = $("#r-pmin").value.trim(); S.pmax = $("#r-pmax").value.trim();
+  S.actuel = $("#r-actuel").checked; S.tri = $("#r-tri").value;
+}
+function ecrireFormulaire() {
+  $("#r-nom").value = S.nom; remplirCategories(); $("#r-groupe").value = S.groupe; remplirSousTypes(); $("#r-sous").value = S.sous;
+  $("#r-raff").value = S.raff; $("#r-slots").value = S.slots; $("#r-pmin").value = S.pmin; $("#r-pmax").value = S.pmax;
+  $("#r-actuel").checked = S.actuel; $("#r-tri").value = S.tri;
+  document.querySelectorAll(".segment button").forEach(b => b.classList.toggle("actif", b.dataset.mode === S.mode));
+  remplirAffixes(); afficherFiltres();
+}
+const encoder = s => btoa(unescape(encodeURIComponent(JSON.stringify(s)))).replace(/=+$/, "");
+const decoder = c => { try { return Object.assign(JSON.parse(JSON.stringify(ETAT_VIDE)), JSON.parse(decodeURIComponent(escape(atob(c))))); } catch (e) { return null; } };
+
+// ---------- listes deroulantes ----------
+function annoncesCategorie(groupe, sous) {
+  return ANN.filter(a => (!groupe || groupeObjet(a.objet) === groupe) && (!sous || sousType(a.objet) === sous));
+}
+function remplirCategories() {
+  const presents = new Set(ANN.map(a => groupeObjet(a.objet)));
+  $("#r-groupe").innerHTML = `<option value="">${t("toutes_cat")}</option>` + GROUPES.filter(g => presents.has(g)).map(g => `<option value="${g}">${t("g_" + g)}</option>`).join("");
+}
+function remplirSousTypes() {
+  const g = $("#r-groupe").value;
+  const sous = {};
+  if (g) for (const a of ANN) if (groupeObjet(a.objet) === g && sousType(a.objet)) sous[sousType(a.objet)] = libSousType(a.objet);
+  const cles = Object.keys(sous).sort((a, b) => sous[a].localeCompare(sous[b], LOCALE()));
+  $("#r-sous").innerHTML = `<option value="">${t("tous_types")}</option>` + cles.map(k => `<option value="${echap(k)}">${echap(sous[k])}</option>`).join("");
+  $("#r-sous").style.display = cles.length > 1 ? "" : "none";
+}
+// affixes proposes = types reellement vus sur les objets de la categorie choisie (une armure ne propose pas « degats + »)
+function remplirAffixes() {
+  const types = {};
+  for (const a of annoncesCategorie(S.groupe, S.sous)) for (const [id] of a.options) types[typeOption(id)] = id;
+  const tries = Object.keys(types).sort((a, b) => a.localeCompare(b, LOCALE()));
+  $("#r-type").innerHTML = `<option value="">${t("choisir_type")}</option>` + tries.map(x => `<option value="${types[x]}">${echap(x)}</option>`).join("");
+  // les filtres d'affixes devenus impossibles dans cette categorie sont retires
+  S.filtres = S.filtres.filter(f => types[typeOption(f.id)] !== undefined);
+}
+function afficherFiltres() {
+  $("#r-filtres").innerHTML = S.filtres.map((f, i) => `<span class="actif-f">${echap(typeOption(f.id).replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}">×</button></span>`).join("");
 }
 
-// ---------- recherche ----------
-let filtres = [];   // [{id, min}] : on garde l'id d'option (independant de la langue)
-const typeDeFiltre = f => typeOption(f.id);
-function afficherFiltres() {
-  $("#r-filtres").innerHTML = filtres.map((f, i) => `<span class="actif-f">${echap(typeDeFiltre(f).replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}">×</button></span>`).join("");
+// ---------- recherches enregistrees ----------
+function sauvees() { try { return JSON.parse(localStorage.getItem("recherches") || "[]"); } catch (e) { return []; } }
+function ecrireSauvees(l) { try { localStorage.setItem("recherches", JSON.stringify(l)); } catch (e) {} }
+function afficherSauvees() {
+  const communes = (D.recherches_communes || []).map((r, i) => `<span class="sauvee commune" title="${t("commune")}"><button data-commune="${i}">👥 ${echap(r.nom)}</button></span>`);
+  const perso = sauvees().map((r, i) => `<span class="sauvee"><button data-sauvee="${i}">${echap(r.nom)}</button><button class="x" data-suppr-sauvee="${i}" title="${t("supprimer")}">×</button></span>`);
+  $("#sauvees").innerHTML = communes.concat(perso).join("") || `<span class="petit">${t("aucune_sauvee")}</span>`;
 }
+function chargerRecherche(s) { S = Object.assign(JSON.parse(JSON.stringify(ETAT_VIDE)), JSON.parse(JSON.stringify(s))); deplies.clear(); ecrireFormulaire(); rechercher(); }
+
+// ---------- recherche ----------
 function rechercher() {
-  const nom = $("#r-nom").value.trim().toLowerCase(), raff = +$("#r-raff").value || 0, actuel = $("#r-actuel").checked;
-  if (!nom && !filtres.length && !raff && !actuel) { $("#r-compte").textContent = ""; $("#r-res").innerHTML = `<div class="vide">${t("recherche_vide")}</div>`; return; }
-  const types = filtres.map(typeDeFiltre);
-  const res = ANN.filter(a => (!nom || nomObjet(a.objet).toLowerCase().includes(nom)) && a.raff >= raff && (!actuel || ACTUELS.has(a.obs.id))
-    && filtres.every((f, i) => a.options.some(([id, v]) => typeOption(id) === types[i] && v >= f.min)));
+  lireFormulaire();
+  history.replaceState(null, "", "#r=" + encoder(S));
+  const nom = S.nom.toLowerCase(), pmin = lirePrix(S.pmin), pmax = lirePrix(S.pmax), types = S.filtres.map(f => typeOption(f.id));
+  const res = ANN.filter(a => (!nom || nomObjet(a.objet).toLowerCase().includes(nom))
+    && (!S.groupe || groupeObjet(a.objet) === S.groupe) && (!S.sous || sousType(a.objet) === S.sous)
+    && a.raff >= S.raff && (!S.slots || slotsObjet(a.objet) >= +S.slots)
+    && (pmin == null || a.prix >= pmin) && (pmax == null || a.prix <= pmax)
+    && (!S.actuel || ACTUELS.has(a.obs.id))
+    && S.filtres.every((f, i) => a.options.some(([id, v]) => typeOption(id) === types[i] && v >= f.min)));
+  // une seule ligne par annonce suivie (meme shop, meme objet) : la lecture la plus recente
   const uniques = {};
   for (const a of res) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
-  const liste = Object.values(uniques);
-  const val = a => types.length ? Math.max(...a.options.filter(([id]) => typeOption(id) === types[0]).map(o => o[1])) : 0;
-  liste.sort((a, b) => (val(b) - val(a)) || (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (a.prix - b.prix));
-  $("#r-compte").textContent = t("resultats", liste.length) + (liste.length > 200 ? t("premiers") : "");
-  $("#r-res").innerHTML = liste.slice(0, 200).map(a => `<div class="resultat">
-      <div>${nomComplet(a)}${affixes(a, types)}</div><div class="prix">${z(a.prix)}</div>
-      <div class="bas">${statut(a)}<span class="meta">${echap(a.obs.titre)}</span><span class="meta">${vue(a)}</span></div></div>`).join("")
-    || `<div class="vide">${t("aucun_resultat")}</div>`;
+  const annonces = Object.values(uniques);
+  const valAff = a => types.length ? Math.max(...a.options.filter(([id]) => typeOption(id) === types[0]).map(o => o[1])) : 0;
+  const triA = { prix: (a, b) => a.prix - b.prix, prix_desc: (a, b) => b.prix - a.prix, recent: (a, b) => b.obs.t - a.obs.t,
+                 affixe: (a, b) => valAff(b) - valAff(a) || a.prix - b.prix, nom: (a, b) => nomObjet(a.objet).localeCompare(nomObjet(b.objet), LOCALE()) || a.prix - b.prix }[S.tri];
+  annonces.sort((a, b) => (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || triA(a, b));
+  const parObjet = {};
+  for (const a of annonces) (parObjet[a.objet] ??= []).push(a);
+  const nbObjets = Object.keys(parObjet).length;
+  $("#r-compte").textContent = t("resultats_objets", nbObjets, annonces.length);
+  if (!annonces.length) { $("#r-res").innerHTML = `<div class="vide">${t("aucun_resultat")}</div>`; return; }
+  if (S.mode === "annonce") {
+    $("#r-res").innerHTML = annonces.slice(0, 200).map(a => carteAnnonce(a, types, true)).join("") + (annonces.length > 200 ? `<p class="compte">${t("premiers")}</p>` : "");
+    return;
+  }
+  // par objet : prix mini, nombre en vente, mediane historique de l'objet
+  const histo = {};
+  for (const a of ANN) (histo[a.objet] ??= []).push(a.prix);
+  const lignes = Object.entries(parObjet).map(([id, l]) => ({ id: +id, l, min: Math.min(...l.map(a => a.prix)), max: Math.max(...l.map(a => a.prix)),
+    recent: Math.max(...l.map(a => a.obs.t)), aff: Math.max(...l.map(valAff)), med: mediane(histo[id]) }));
+  const triO = { prix: (a, b) => a.min - b.min, prix_desc: (a, b) => b.max - a.max, recent: (a, b) => b.recent - a.recent,
+                 affixe: (a, b) => b.aff - a.aff || a.min - b.min, nom: (a, b) => nomObjet(a.id).localeCompare(nomObjet(b.id), LOCALE()) }[S.tri];
+  lignes.sort(triO);
+  $("#r-res").innerHTML = lignes.slice(0, 200).map(o => {
+    const enVente = o.l.filter(a => ACTUELS.has(a.obs.id)).length, ouvert = deplies.has(o.id);
+    return `<div class="ligne-objet"><div class="tete-ligne">
+        <div><span class="nom-objet">${icone(o.id)}${lienObjet(o.id)}</span><div class="cat">${echap(libSousType(o.id) || t("g_" + groupeObjet(o.id)))}</div></div>
+        <div class="chiffres-l">
+          <div><small>${S.actuel ? t("en_vente_n") : t("vus_n")}</small><b>${S.actuel ? enVente : o.l.length}</b></div>
+          <div><small>${t("moins_cher")}</small><b>${z(o.min)}</b></div>
+          <div><small>${t("mediane")}</small><b>${court(o.med)}</b></div></div>
+        <button class="deplier" data-deplier="${o.id}">${ouvert ? t("masquer") : t("voir", o.l.length)}</button></div>
+      ${ouvert ? `<div class="annonces-objet">${o.l.map(a => carteAnnonce(a, types, false)).join("")}</div>` : ""}</div>`;
+  }).join("") + (lignes.length > 200 ? `<p class="compte">${t("premiers")}</p>` : "");
+}
+function carteAnnonce(a, types, complet) {
+  const corps = `<div>${complet ? nomComplet(a) : `<span class="nom-objet">${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}</span>`}${affixes(a, types)}</div>
+    <div class="prix">${z(a.prix)}</div>
+    <div class="bas">${statut(a)}<span class="meta">${echap(a.obs.titre)}</span><span class="meta">${vue(a)}</span></div>`;
+  return complet ? `<div class="resultat">${corps}</div>` : `<div class="annonce">${corps}</div>`;
 }
 
 // ---------- fiche objet ----------
 let graphique = null, objetCourant = null;
+function montrer(v) { document.querySelectorAll(".vue").forEach(s => s.classList.toggle("active", s.id === "vue-" + v)); window.scrollTo(0, 0); }
 function ficheObjet(id) {
-  objetCourant = id;
-  activer("objet"); $("#o-nom").value = nomObjet(id); history.replaceState(null, "", "#objet=" + id);
+  objetCourant = id; montrer("objet"); history.replaceState(null, "", "#objet=" + id);
   const anns = ANN.filter(a => a.objet === id), ventes = D.ventes.filter(v => v[2] === id);
   if (!anns.length) { $("#o-contenu").innerHTML = `<div class="vide">${t("aucune_annonce")}</div>`; return; }
   const parJour = {};
@@ -377,8 +496,8 @@ function ficheObjet(id) {
   const tuile = (l, v) => `<div class="tuile"><small>${t(l)}</small><b>${v}</b></div>`;
   const uniques = {};
   for (const a of anns) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
-  const liste = Object.values(uniques).sort((a, b) => (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (b.obs.t - a.obs.t));
-  $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}</h2><span class="meta">${t("annonces_suivies", liste.length)}</span></div>
+  const liste = Object.values(uniques).sort((a, b) => (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (a.prix - b.prix));
+  $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}</h2><span class="meta">${echap(libSousType(id) || t("g_" + groupeObjet(id)))} · ${t("annonces_suivies", liste.length)}</span></div>
     <div class="tuiles">${tuile("t_vente", actuels.length)}${tuile("t_moins_cher", prixAct.length ? court(Math.min(...prixAct)) + " z" : "—")}
       ${tuile("t_mediane", court(mediane(tous)) + " z")}${tuile("t_fourchette", court(Math.min(...tous)) + " – " + court(Math.max(...tous)))}${tuile("t_ventes", nbVentes)}</div>
     <div class="graph"><canvas id="o-graph"></canvas></div>
@@ -401,48 +520,55 @@ function ficheObjet(id) {
         v: { position: "right", beginAtZero: true, ticks: { color: c("--tres-doux"), precision: 0 }, grid: { display: false }, border: { display: false } } } } });
 }
 
-// ---------- navigation, theme, langue ----------
-function activer(p) {
-  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("actif", b.dataset.p === p));
-  document.querySelectorAll(".panneau").forEach(s => s.classList.toggle("actif", s.id === "p-" + p));
-  try { localStorage.setItem("onglet", p); } catch (e) {}
-  if (p !== "objet") history.replaceState(null, "", "#" + p);
+// ---------- en-tete ----------
+function entete() {
+  const enVente = ANN.filter(a => ACTUELS.has(a.obs.id)).length;
+  $("#entete").textContent = t("derniere", ilya(D.derniere_tournee), date(D.derniere_tournee));
+  $("#stats").innerHTML = [[D.actuels.length, "st_shops"], [enVente, "st_objets"], [ANN.length, "st_annonces"], [D.ventes.length, "st_ventes"]]
+    .map(([n, l]) => `<div class="stat"><b>${nombre(n)}</b><small>${t(l)}</small></div>`).join("");
+  $("#noms").innerHTML = [...new Set(ANN.map(a => nomObjet(a.objet)))].sort((a, b) => a.localeCompare(b, LOCALE())).map(n => `<option value="${echap(n)}">`).join("");
 }
-function suivreLien() {
-  const h = location.hash.slice(1);
-  if (h.startsWith("objet=")) { ficheObjet(+h.slice(6)); return true; }
-  if (h.startsWith("recherche=")) { $("#r-nom").value = decodeURIComponent(h.slice(10)); activer("recherche"); rechercher(); return true; }
-  if (["actuels", "recherche"].includes(h)) { activer(h); return true; }
-  return false;
-}
-window.addEventListener("hashchange", () => D && suivreLien());
-document.querySelector("nav").onclick = e => { const p = e.target.dataset.p; if (p) activer(p); };
-document.body.addEventListener("click", e => { const b = e.target.closest("[data-objet]"); if (b) ficheObjet(+b.dataset.objet); });
-$("#f-shops").oninput = afficherShops; $("#tri-shops").onchange = afficherShops;
-["#r-nom", "#r-raff", "#r-actuel"].forEach(s => $(s).oninput = rechercher);
-$("#r-ajout").onclick = () => {
-  const ty = $("#r-type").value; if (!ty) return;
-  const a = ANN.find(x => x.options.some(([id]) => typeOption(id) === ty)); if (!a) return;
-  const id = a.options.find(([i]) => typeOption(i) === ty)[0];
-  filtres.push({ id, min: +$("#r-val").value || 0 }); $("#r-type").value = ""; afficherFiltres(); rechercher();
-};
-$("#r-filtres").onclick = e => { const i = e.target.dataset.suppr; if (i != null) { filtres.splice(+i, 1); afficherFiltres(); rechercher(); } };
-$("#o-nom").onchange = () => { const n = $("#o-nom").value; const a = ANN.find(x => nomObjet(x.objet) === n); if (a) ficheObjet(a.objet); };
+
+// ---------- evenements ----------
+document.body.addEventListener("click", e => {
+  const o = e.target.closest("[data-objet]"); if (o) { ficheObjet(+o.dataset.objet); return; }
+  const d = e.target.closest("[data-deplier]"); if (d) { const id = +d.dataset.deplier; deplies.has(id) ? deplies.delete(id) : deplies.add(id); rechercher(); return; }
+  const c = e.target.closest("[data-commune]"); if (c) { chargerRecherche(D.recherches_communes[+c.dataset.commune].s); return; }
+  const s = e.target.closest("[data-sauvee]"); if (s) { chargerRecherche(sauvees()[+s.dataset.sauvee].s); return; }
+  const x = e.target.closest("[data-suppr-sauvee]"); if (x) { const l = sauvees(); l.splice(+x.dataset.supprSauvee, 1); ecrireSauvees(l); afficherSauvees(); return; }
+  const m = e.target.closest("[data-mode]"); if (m) { S.mode = m.dataset.mode; document.querySelectorAll(".segment button").forEach(b => b.classList.toggle("actif", b === m)); rechercher(); return; }
+});
+["#r-nom", "#r-raff", "#r-pmin", "#r-pmax"].forEach(s => $(s).addEventListener("input", rechercher));
+["#r-slots", "#r-actuel", "#r-tri", "#r-sous"].forEach(s => $(s).addEventListener("change", () => { lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); }));
+$("#r-groupe").addEventListener("change", () => { $("#r-sous").value = ""; remplirSousTypes(); lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); });
+$("#r-ajout").onclick = () => { const id = +$("#r-type").value; if (!id) return; S.filtres.push({ id, min: +$("#r-val").value || 0 }); $("#r-type").value = ""; if (S.tri === "prix") $("#r-tri").value = "affixe"; afficherFiltres(); rechercher(); };
+$("#r-filtres").onclick = e => { const i = e.target.dataset.suppr; if (i != null) { S.filtres.splice(+i, 1); afficherFiltres(); rechercher(); } };
+$("#b-sauver").onclick = () => { $("#f-sauver").style.display = "flex"; $("#nom-sauver").value = S.nom || ""; $("#nom-sauver").focus(); };
+$("#f-sauver").onsubmit = e => { e.preventDefault(); const n = $("#nom-sauver").value.trim(); if (!n) return; lireFormulaire();
+  const l = sauvees().filter(r => r.nom !== n); l.push({ nom: n, s: JSON.parse(JSON.stringify(S)) }); ecrireSauvees(l); $("#f-sauver").style.display = "none"; afficherSauvees(); };
+$("#b-lien").onclick = async () => { lireFormulaire(); const lien = location.origin + location.pathname + (LANGUE ? "?lang=fr" : "") + "#r=" + encoder(S);
+  try { await navigator.clipboard.writeText(lien); $("#msg-lien").textContent = t("lien_copie"); } catch (e) { $("#msg-lien").textContent = lien; } };
+$("#b-reset").onclick = () => chargerRecherche(ETAT_VIDE);
+$("#b-retour").onclick = () => { montrer("market"); rechercher(); };
 function appliquerTheme(th) { if (th) document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme; }
 try { appliquerTheme(localStorage.getItem("theme")); } catch (e) {}
 $("#theme").onclick = () => {
   const sombre = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   const th = sombre ? "light" : "dark"; appliquerTheme(th); try { localStorage.setItem("theme", th); } catch (e) {}
-  if (objetCourant && $("#p-objet").classList.contains("actif")) ficheObjet(objetCourant);
+  if (objetCourant && $("#vue-objet").classList.contains("active")) ficheObjet(objetCourant);
 };
 function toutAfficher() {
-  traduirePage();
-  if (!D) return;
-  textesLangue(); afficherFiltres(); afficherShops(); rechercher();
-  if (objetCourant) { $("#o-nom").value = nomObjet(objetCourant); if ($("#p-objet").classList.contains("actif")) ficheObjet(objetCourant); }
-  else $("#o-contenu").innerHTML = `<div class="vide">${t("fiche_vide")}</div>`;
+  traduirePage(); if (!D) return;
+  entete(); afficherSauvees(); ecrireFormulaire();
+  if ($("#vue-objet").classList.contains("active") && objetCourant) ficheObjet(objetCourant); else rechercher();
 }
 $("#langue").onclick = () => { LANGUE = 1 - LANGUE; try { localStorage.setItem("langue", LANGUE ? "fr" : "en"); } catch (e) {} toutAfficher(); };
+function suivreLien() {
+  const h = location.hash.slice(1);
+  if (h.startsWith("objet=")) { ficheObjet(+h.slice(6)); return; }
+  if (h.startsWith("r=")) { const s = decoder(h.slice(2)); if (s) { S = s; ecrireFormulaire(); } }
+  montrer("market"); rechercher();
+}
 
 // ---------- chargement (en clair en local, chiffre une fois publie) ----------
 async function dechiffrer(paquet, mdp) {
@@ -452,12 +578,7 @@ async function dechiffrer(paquet, mdp) {
     { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
   return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(paquet.iv) }, cle, b(paquet.donnees))));
 }
-function demarrer(donnees) {
-  D = donnees; preparer(); toutAfficher();
-  if (suivreLien()) return;
-  let o = "actuels"; try { o = localStorage.getItem("onglet") || o; } catch (e) {}
-  activer(["actuels", "recherche"].includes(o) ? o : "actuels");
-}
+function demarrer(donnees) { D = donnees; preparer(); traduirePage(); entete(); afficherSauvees(); ecrireFormulaire(); suivreLien(); }
 traduirePage(); $("#entete").textContent = t("chargement");
 (async () => {
   const r = await fetch("donnees/market.json", { cache: "no-store" });

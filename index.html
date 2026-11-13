@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<title>Marché Prontera</title>
+<title>Prontera Market</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -130,36 +130,44 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 #verrou h2 { margin: 0; font-size: 20px; }
 #verrou p { margin: 0; color: var(--doux); font-size: 13.5px; }
 #mdp-err { color: var(--rouge); font-size: 13px; min-height: 1em; }
+
+.ico { width: 24px; height: 24px; image-rendering: pixelated; vertical-align: middle; margin-right: 6px; flex: none; }
+.ico.grand { width: 36px; height: 36px; margin-right: 10px; }
+.nom-objet { display: inline-flex; align-items: center; flex-wrap: wrap; }
+.outils { display: flex; gap: 8px; }
 </style>
 </head>
 <body>
 <div id="verrou"><form id="form-mdp">
-  <h2>Marché de <span style="color:var(--accent)">Prontera</span></h2>
-  <p>Accès réservé. Entre le mot de passe.</p>
-  <input id="mdp" type="password" autocomplete="current-password" placeholder="Mot de passe">
-  <button class="bouton">Ouvrir</button><div id="mdp-err"></div>
+  <h2 data-t="titre_html"></h2>
+  <p data-t="acces"></p>
+  <input id="mdp" type="password" autocomplete="current-password" data-tp="mdp">
+  <button class="bouton" data-t="ouvrir"></button><div id="mdp-err"></div>
 </form></div>
 
 <div class="page">
   <header>
-    <div class="marque"><h1>Marché de <span>Prontera</span></h1><p id="entete">Chargement…</p></div>
+    <div class="marque"><h1 data-t="titre_html"></h1><p id="entete"></p></div>
     <div class="stats" id="stats"></div>
   </header>
 
   <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start">
     <nav>
-      <button data-p="actuels" class="actif">Shops en vente</button>
-      <button data-p="recherche">Recherche</button>
-      <button data-p="objet">Fiche objet</button>
+      <button data-p="actuels" class="actif" data-t="onglet_shops"></button>
+      <button data-p="recherche" data-t="onglet_recherche"></button>
+      <button data-p="objet" data-t="onglet_objet"></button>
     </nav>
-    <button class="theme" id="theme" title="Changer de thème">◐ Thème</button>
+    <div class="outils">
+      <button class="theme" id="langue" title="Language / Langue"></button>
+      <button class="theme" id="theme" data-t="theme"></button>
+    </div>
   </div>
 
   <section class="panneau actif" id="p-actuels">
     <div class="barre">
       <div class="champ-recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="f-shops" type="search" placeholder="Filtrer par titre de shop ou par objet…"></div>
-      <select id="tri-shops"><option value="recent">Plus récents</option><option value="objets">Plus d'objets</option><option value="titre">Titre A → Z</option></select>
+        <input id="f-shops" type="search" data-tp="filtre_shops"></div>
+      <select id="tri-shops"><option value="recent" data-t="tri_recent"></option><option value="objets" data-t="tri_objets"></option><option value="titre" data-t="tri_titre"></option></select>
     </div>
     <div class="grille" id="liste-shops"></div>
   </section>
@@ -167,14 +175,14 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
   <section class="panneau" id="p-recherche">
     <div class="disposition">
       <aside class="filtres">
-        <div><label class="titre" for="r-nom">Objet</label><input id="r-nom" type="search" list="noms" placeholder="Nom (vide = tous)"></div>
+        <div><label class="titre" for="r-nom" data-t="objet"></label><input id="r-nom" type="search" list="noms" data-tp="nom_vide"></div>
         <datalist id="noms"></datalist>
-        <div><label class="titre" for="r-raff">Raffinage minimum</label><input id="r-raff" type="number" min="0" max="20" value="0"></div>
-        <div><label class="titre" for="r-type">Affixes</label>
-          <select id="r-type"><option value="">Choisir un type d'affixe…</option></select>
-          <div class="ligne" style="margin-top:8px"><input id="r-val" type="number" value="1" title="valeur minimale"><button class="bouton" id="r-ajout">Ajouter</button></div>
+        <div><label class="titre" for="r-raff" data-t="raff_min"></label><input id="r-raff" type="number" min="0" max="20" value="0"></div>
+        <div><label class="titre" for="r-type" data-t="affixes"></label>
+          <select id="r-type"></select>
+          <div class="ligne" style="margin-top:8px"><input id="r-val" type="number" value="1"><button class="bouton" id="r-ajout" data-t="ajouter"></button></div>
           <div class="actifs" id="r-filtres" style="margin-top:10px"></div></div>
-        <label class="bascule"><input id="r-actuel" type="checkbox"> En vente actuellement</label>
+        <label class="bascule"><input id="r-actuel" type="checkbox"> <span data-t="en_vente_seul"></span></label>
       </aside>
       <div><p class="compte" id="r-compte"></p><div class="resultats" id="r-res"></div></div>
     </div>
@@ -182,39 +190,86 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 
   <section class="panneau" id="p-objet">
     <div class="barre"><div class="champ-recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="o-nom" type="search" list="noms" placeholder="Choisir un objet…"></div></div>
-    <div id="o-contenu"><div class="vide">Choisis un objet, ou clique sur un nom d'objet dans les autres onglets.</div></div>
+      <input id="o-nom" type="search" list="noms" data-tp="choisir_objet"></div></div>
+    <div id="o-contenu"></div>
   </section>
 </div>
 
 <script>
 "use strict";
+// ---------- traductions (anglais par defaut) ----------
+const T = {
+  titre_html: ["Prontera <span>Market</span>", "Marché de <span>Prontera</span>"],
+  acces: ["Private access. Enter the password.", "Accès réservé. Entre le mot de passe."],
+  mdp: ["Password", "Mot de passe"], ouvrir: ["Open", "Ouvrir"], mdp_faux: ["Wrong password.", "Mot de passe incorrect."],
+  onglet_shops: ["Shops", "Shops en vente"], onglet_recherche: ["Search", "Recherche"], onglet_objet: ["Item", "Fiche objet"],
+  theme: ["◐ Theme", "◐ Thème"],
+  filtre_shops: ["Filter by shop title or item…", "Filtrer par titre de shop ou par objet…"],
+  tri_recent: ["Most recent", "Plus récents"], tri_objets: ["Most items", "Plus d'objets"], tri_titre: ["Title A → Z", "Titre A → Z"],
+  objet: ["Item", "Objet"], nom_vide: ["Name (empty = all)", "Nom (vide = tous)"], raff_min: ["Minimum refine", "Raffinage minimum"],
+  affixes: ["Random options", "Affixes"], choisir_type: ["Choose an option type…", "Choisir un type d'affixe…"],
+  ajouter: ["Add", "Ajouter"], en_vente_seul: ["Currently for sale", "En vente actuellement"],
+  choisir_objet: ["Pick an item…", "Choisir un objet…"],
+  fiche_vide: ["Pick an item, or click an item name in the other tabs.", "Choisis un objet, ou clique sur un nom d'objet dans les autres onglets."],
+  derniere: ["Last run {0} ({1})", "Dernière tournée {0} ({1})"],
+  st_shops: ["shops open", "shops en vente"], st_objets: ["items for sale", "objets en vente"],
+  st_annonces: ["tracked listings", "annonces suivies"], st_ventes: ["likely sales", "ventes probables"],
+  il_y_a_min: ["{0} min ago", "il y a {0} min"], il_y_a_h: ["{0} h ago", "il y a {0} h"], il_y_a_j: ["{0} d ago", "il y a {0} j"],
+  case_: ["cell {0}, {1}", "case {0}, {1}"], pos_inconnue: ["unknown position", "position inconnue"],
+  lu: ["read {0}", "lu {0}"], duree: ["limited time", "durée limitée"], depuis: ["for sale since {0}", "en vente depuis le {0}"],
+  aucun_shop: ["No matching shop.", "Aucun shop ne correspond."],
+  en_vente: ["● for sale", "● en vente"], vendu: ["sold?", "vendu ?"], ancienne: ["old listing", "ancienne annonce"],
+  ferme: ["shop closed {0}", "shop fermé le {0}"], deconnexion: ["vendor logged out {0}", "vendeur déconnecté le {0}"], absent: ["shop gone {0}", "shop absent le {0}"],
+  vu_le: ["seen {0}", "vu le {0}"], vu_du: ["seen {0} → {1}", "vu du {0} au {1}"],
+  recherche_vide: ["Type an item name or add an option filter.<br>Search also covers items no longer for sale.", "Tape un nom d'objet ou ajoute un filtre d'affixe.<br>La recherche couvre aussi les objets qui ne sont plus en vente."],
+  resultats: ["{0} result(s)", "{0} résultat(s)"], premiers: [" · first 200 shown", " · 200 premiers affichés"], aucun_resultat: ["No results.", "Aucun résultat."],
+  aucune_annonce: ["No listing for this item.", "Aucune annonce pour cet objet."], annonces_suivies: ["{0} tracked listing(s)", "{0} annonce(s) suivie(s)"],
+  t_vente: ["For sale now", "En vente maintenant"], t_moins_cher: ["Cheapest now", "Moins cher actuel"], t_mediane: ["Median price (history)", "Prix médian (historique)"],
+  t_fourchette: ["Price range seen", "Fourchette vue"], t_ventes: ["Likely sales", "Ventes probables"],
+  g_min: ["Min price", "Prix minimum"], g_mediane: ["Median price", "Prix médian"], g_annonces: ["Listings seen", "Annonces vues"], g_ventes: ["Likely sales", "Ventes probables"],
+  c_objet: ["Item", "Objet"], c_prix: ["Price", "Prix"], c_presence: ["Seen", "Présence"], c_statut: ["Status", "Statut"],
+  donnees_absentes: ["Data not found.", "Données introuvables."], chargement: ["Loading…", "Chargement…"],
+};
+let LANGUE = 0;                                     // 0 = anglais (defaut), 1 = francais
+try { LANGUE = localStorage.getItem("langue") === "fr" ? 1 : 0; } catch (e) {}
+if (/[?&]lang=fr/.test(location.search)) LANGUE = 1;
+if (/[?&]lang=en/.test(location.search)) LANGUE = 0;
+const t = (cle, ...a) => (T[cle] ? T[cle][LANGUE] : cle).replace(/\{(\d)\}/g, (_, i) => a[+i]);
+const LOCALE = () => LANGUE ? "fr-FR" : "en-GB";
+function traduirePage() {
+  document.documentElement.lang = LANGUE ? "fr" : "en";
+  document.title = LANGUE ? "Marché Prontera" : "Prontera Market";
+  document.querySelectorAll("[data-t]").forEach(el => el.innerHTML = t(el.dataset.t));
+  document.querySelectorAll("[data-tp]").forEach(el => el.placeholder = t(el.dataset.tp));
+  $("#langue").textContent = LANGUE ? "EN" : "FR";
+}
+
 let D = null;
 const $ = s => document.querySelector(s);
-const nombre = n => Math.round(n).toLocaleString("fr-FR");
+const nombre = n => Math.round(n).toLocaleString(LOCALE());
 const z = n => `${nombre(n)}<small>z</small>`;
-const court = n => n >= 1e6 ? (n / 1e6).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " M" : n >= 1e3 ? (n / 1e3).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " k" : String(n);
-const date = t => new Date(t * 1000).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-const jour = t => { const d = new Date(t * 1000); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
-const ilya = t => { const s = Date.now() / 1000 - t; return s < 3600 ? `il y a ${Math.max(1, Math.round(s / 60))} min` : s < 86400 ? `il y a ${Math.round(s / 3600)} h` : `il y a ${Math.round(s / 86400)} j`; };
+const court = n => n >= 1e6 ? (n / 1e6).toLocaleString(LOCALE(), { maximumFractionDigits: 2 }) + " M" : n >= 1e3 ? (n / 1e3).toLocaleString(LOCALE(), { maximumFractionDigits: 1 }) + " k" : String(n);
+const date = ts => new Date(ts * 1000).toLocaleString(LOCALE(), { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+const jour = ts => { const d = new Date(ts * 1000); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const ilya = ts => { const s = Date.now() / 1000 - ts; return s < 3600 ? t("il_y_a_min", Math.max(1, Math.round(s / 60))) : s < 86400 ? t("il_y_a_h", Math.round(s / 3600)) : t("il_y_a_j", Math.round(s / 86400)); };
 const echap = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const nomObjet = id => (D.objets[id] || ["objet " + id])[0];
-const gabarit = id => D.options[id] || ("option " + id);
+const nomObjet = id => (D.objets[id] || [])[LANGUE] || ((LANGUE ? "objet " : "item ") + id);
+const gabarit = id => (D.options[id] || [])[LANGUE] || ("option " + id);
 const texteOption = (id, v) => gabarit(id).replace("%d", v).replace("%%", "%");
 const typeOption = id => gabarit(id).replace("%d", "X").replace("%%", "%").trim();
+const icone = (id, grand) => `<img class="ico${grand ? " grand" : ""}" src="icones/${id}.png" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
 const mediane = a => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
 
 // ---------- preparation des donnees ----------
 let OBS = {}, ANN = [], ACTUELS = new Set(), VENDUS = new Set(), PERIODE = {}, DERNIERE_LECTURE = {};
 function preparer() {
-  for (const [id, aid, t, titre, x, y, special] of D.observations) {
-    OBS[id] = { id, aid, t, titre, special, ou: x ? `case ${x}, ${y}` : "position inconnue" };
-    DERNIERE_LECTURE[aid] = Math.max(DERNIERE_LECTURE[aid] || 0, t);
+  for (const [id, aid, ts, titre, x, y, special] of D.observations) {
+    OBS[id] = { id, aid, t: ts, titre, special, x, y };
+    DERNIERE_LECTURE[aid] = Math.max(DERNIERE_LECTURE[aid] || 0, ts);
   }
   ACTUELS = new Set(D.actuels);
   ANN = D.annonces.map(([obs, objet, prix, q, raff, cartes, options]) => ({ obs: OBS[obs], objet, prix, q, raff, cartes, options,
     sig: JSON.stringify([objet, raff, [...cartes].sort(), options.map(o => o[0] + ":" + o[1]).sort()]) }));
-  // vendu probable : la signature n'est plus dans la lecture suivante du meme shop
   const parShop = {};
   for (const a of ANN) ((parShop[a.obs.aid] ??= {})[a.obs.id] ??= []).push(a);
   for (const lectures of Object.values(parShop)) {
@@ -224,37 +279,39 @@ function preparer() {
       for (const a of lectures[ids[i]]) if (!suivantes.has(a.sig)) VENDUS.add(a);
     }
   }
-  // periode de presence : premiere et derniere lecture du meme objet dans le meme shop
   for (const a of ANN) {
     const p = (PERIODE[a.obs.aid + "|" + a.sig] ??= { premier: a.obs.t, dernier: a.obs.t });
     p.premier = Math.min(p.premier, a.obs.t); p.dernier = Math.max(p.dernier, a.obs.t);
   }
-  const noms = [...new Set(ANN.map(a => nomObjet(a.objet)))].sort((a, b) => a.localeCompare(b, "fr"));
+}
+// textes qui dependent de la langue (liste de noms, types d'affixes, en-tete)
+function textesLangue() {
+  const noms = [...new Set(ANN.map(a => nomObjet(a.objet)))].sort((a, b) => a.localeCompare(b, LOCALE()));
   $("#noms").innerHTML = noms.map(n => `<option value="${echap(n)}">`).join("");
   const types = {};
   for (const a of ANN) for (const [id] of a.options) types[typeOption(id)] = 1;
-  $("#r-type").innerHTML += Object.keys(types).sort((a, b) => a.localeCompare(b, "fr")).map(t => `<option>${echap(t)}</option>`).join("");
+  $("#r-type").innerHTML = `<option value="">${t("choisir_type")}</option>` + Object.keys(types).sort((a, b) => a.localeCompare(b, LOCALE())).map(x => `<option>${echap(x)}</option>`).join("");
   const enVente = ANN.filter(a => ACTUELS.has(a.obs.id)).length;
-  $("#entete").textContent = `Dernière tournée ${ilya(D.derniere_tournee)} (${date(D.derniere_tournee)})`;
-  $("#stats").innerHTML = [[D.actuels.length, "shops en vente"], [enVente, "objets en vente"], [ANN.length, "annonces suivies"], [D.ventes.length, "ventes probables"]]
-    .map(([n, l]) => `<div class="stat"><b>${nombre(n)}</b><small>${l}</small></div>`).join("");
+  $("#entete").textContent = t("derniere", ilya(D.derniere_tournee), date(D.derniere_tournee));
+  $("#stats").innerHTML = [[D.actuels.length, "st_shops"], [enVente, "st_objets"], [ANN.length, "st_annonces"], [D.ventes.length, "st_ventes"]]
+    .map(([n, l]) => `<div class="stat"><b>${nombre(n)}</b><small>${t(l)}</small></div>`).join("");
 }
+const ou = o => o.x ? t("case_", o.x, o.y) : t("pos_inconnue");
 const periode = a => PERIODE[a.obs.aid + "|" + a.sig];
-const vue = a => { const p = periode(a); return p.premier === p.dernier ? "vu le " + date(p.premier) : "vu du " + date(p.premier) + " au " + date(p.dernier); };
-const LIB_DISP = { ferme: "shop fermé", deconnexion: "vendeur déconnecté", absent: "shop absent" };
+const vue = a => { const p = periode(a); return p.premier === p.dernier ? t("vu_le", date(p.premier)) : t("vu_du", date(p.premier), date(p.dernier)); };
 function disparition(a) {
   if (DERNIERE_LECTURE[a.obs.aid] > a.obs.t) return null;
-  return (D.disparitions || []).find(([aid, t]) => aid === a.obs.aid && t > a.obs.t) || null;
+  return (D.disparitions || []).find(([aid, ts]) => aid === a.obs.aid && ts > a.obs.t) || null;
 }
 function statut(a) {
-  if (ACTUELS.has(a.obs.id)) return '<span class="puce p-vente">● en vente</span>';
-  if (VENDUS.has(a)) return '<span class="puce p-vendu">vendu ?</span>';
+  if (ACTUELS.has(a.obs.id)) return `<span class="puce p-vente">${t("en_vente")}</span>`;
+  if (VENDUS.has(a)) return `<span class="puce p-vendu">${t("vendu")}</span>`;
   const d = disparition(a);
-  if (d) return `<span class="puce p-ancien">${LIB_DISP[d[2]] || "disparu"} le ${date(d[1])}</span>`;
-  return '<span class="puce p-ancien">ancienne annonce</span>';
+  if (d) return `<span class="puce p-ancien">${t(d[2] in T ? d[2] : "absent", date(d[1]))}</span>`;
+  return `<span class="puce p-ancien">${t("ancienne")}</span>`;
 }
 const lienObjet = id => `<button class="lien" data-objet="${id}">${echap(nomObjet(id))}</button>`;
-const nomComplet = (a, lien = true) => `${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${lien ? lienObjet(a.objet) : `<b>${echap(nomObjet(a.objet))}</b>`}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}`;
+const nomComplet = (a, lien = true) => `<span class="nom-objet">${icone(a.objet)}${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${lien ? lienObjet(a.objet) : `<b>${echap(nomObjet(a.objet))}</b>`}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}</span>`;
 function affixes(a, surligner = []) {
   const opts = a.options.map(([id, v]) => `<span class="affixe${surligner.includes(typeOption(id)) ? " match" : ""}">${echap(texteOption(id, v))}</span>`);
   const cartes = a.cartes.filter(c => D.objets[c]).map(c => `<span class="affixe carte">${echap(nomObjet(c))}</span>`);
@@ -268,50 +325,48 @@ function afficherShops() {
   for (const a of ANN) if (ACTUELS.has(a.obs.id)) (parObs[a.obs.id] ??= []).push(a);
   let shops = D.actuels.map(id => OBS[id]).filter(o => !f || (o.titre || "").toLowerCase().includes(f)
     || (parObs[o.id] || []).some(a => nomObjet(a.objet).toLowerCase().includes(f)));
-  shops.sort(tri === "titre" ? (a, b) => (a.titre || "").localeCompare(b.titre || "", "fr")
+  shops.sort(tri === "titre" ? (a, b) => (a.titre || "").localeCompare(b.titre || "", LOCALE())
     : tri === "objets" ? (a, b) => (parObs[b.id] || []).length - (parObs[a.id] || []).length : (a, b) => b.t - a.t);
   $("#liste-shops").innerHTML = shops.map(o => `<article class="shop">
       <div class="shop-tete"><h3>${echap(o.titre)}</h3>
-        <div class="meta">${o.special ? '<span class="puce p-special">durée limitée</span> ' : ""}${o.ou} · lu ${ilya(o.t)}</div></div>
+        <div class="meta">${o.special ? `<span class="puce p-special">${t("duree")}</span> ` : ""}${ou(o)} · ${t("lu", ilya(o.t))}</div></div>
       <ul>${(parObs[o.id] || []).sort((a, b) => b.prix - a.prix).map(a => {
-        const p = periode(a), depuis = p.premier < a.obs.t ? `en vente depuis le ${date(p.premier)}` : "";
+        const p = periode(a), depuis = p.premier < a.obs.t ? t("depuis", date(p.premier)) : "";
         return `<li><span>${nomComplet(a)}</span><span class="prix">${z(a.prix)}</span>${a.options.length || a.cartes.some(c => D.objets[c]) ? `<div class="meta">${affixes(a)}</div>` : ""}${depuis ? `<div class="meta">${depuis}</div>` : ""}</li>`;
-      }).join("")}</ul></article>`).join("") || '<div class="vide">Aucun shop ne correspond.</div>';
+      }).join("")}</ul></article>`).join("") || `<div class="vide">${t("aucun_shop")}</div>`;
 }
 
 // ---------- recherche ----------
-let filtres = [];
+let filtres = [];   // [{id, min}] : on garde l'id d'option (independant de la langue)
+const typeDeFiltre = f => typeOption(f.id);
 function afficherFiltres() {
-  $("#r-filtres").innerHTML = filtres.map((f, i) => `<span class="actif-f">${echap(f.type.replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}" title="Retirer">×</button></span>`).join("");
+  $("#r-filtres").innerHTML = filtres.map((f, i) => `<span class="actif-f">${echap(typeDeFiltre(f).replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}">×</button></span>`).join("");
 }
 function rechercher() {
   const nom = $("#r-nom").value.trim().toLowerCase(), raff = +$("#r-raff").value || 0, actuel = $("#r-actuel").checked;
-  if (!nom && !filtres.length && !raff && !actuel) {
-    $("#r-compte").textContent = ""; $("#r-res").innerHTML = '<div class="vide">Tape un nom d\'objet ou ajoute un filtre d\'affixe.<br>La recherche couvre aussi les objets qui ne sont plus en vente.</div>'; return;
-  }
+  if (!nom && !filtres.length && !raff && !actuel) { $("#r-compte").textContent = ""; $("#r-res").innerHTML = `<div class="vide">${t("recherche_vide")}</div>`; return; }
+  const types = filtres.map(typeDeFiltre);
   const res = ANN.filter(a => (!nom || nomObjet(a.objet).toLowerCase().includes(nom)) && a.raff >= raff && (!actuel || ACTUELS.has(a.obs.id))
-    && filtres.every(f => a.options.some(([id, v]) => typeOption(id) === f.type && v >= f.min)));
-  // une seule ligne par objet suivi (meme shop, meme objet) : la lecture la plus recente
+    && filtres.every((f, i) => a.options.some(([id, v]) => typeOption(id) === types[i] && v >= f.min)));
   const uniques = {};
   for (const a of res) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
   const liste = Object.values(uniques);
-  const f0 = filtres[0];
-  const val = a => f0 ? Math.max(...a.options.filter(([id]) => typeOption(id) === f0.type).map(o => o[1])) : 0;
+  const val = a => types.length ? Math.max(...a.options.filter(([id]) => typeOption(id) === types[0]).map(o => o[1])) : 0;
   liste.sort((a, b) => (val(b) - val(a)) || (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (a.prix - b.prix));
-  const types = filtres.map(f => f.type);
-  $("#r-compte").textContent = `${liste.length} résultat${liste.length > 1 ? "s" : ""}${liste.length > 200 ? " · 200 premiers affichés" : ""}`;
+  $("#r-compte").textContent = t("resultats", liste.length) + (liste.length > 200 ? t("premiers") : "");
   $("#r-res").innerHTML = liste.slice(0, 200).map(a => `<div class="resultat">
       <div>${nomComplet(a)}${affixes(a, types)}</div><div class="prix">${z(a.prix)}</div>
       <div class="bas">${statut(a)}<span class="meta">${echap(a.obs.titre)}</span><span class="meta">${vue(a)}</span></div></div>`).join("")
-    || '<div class="vide">Aucun résultat.</div>';
+    || `<div class="vide">${t("aucun_resultat")}</div>`;
 }
 
 // ---------- fiche objet ----------
-let graphique = null;
+let graphique = null, objetCourant = null;
 function ficheObjet(id) {
+  objetCourant = id;
   activer("objet"); $("#o-nom").value = nomObjet(id); history.replaceState(null, "", "#objet=" + id);
   const anns = ANN.filter(a => a.objet === id), ventes = D.ventes.filter(v => v[2] === id);
-  if (!anns.length) { $("#o-contenu").innerHTML = '<div class="vide">Aucune annonce pour cet objet.</div>'; return; }
+  if (!anns.length) { $("#o-contenu").innerHTML = `<div class="vide">${t("aucune_annonce")}</div>`; return; }
   const parJour = {};
   const j0 = j => (parJour[j] ??= { prix: [], annonces: 0, ventes: 0 });
   for (const a of anns) { const j = j0(jour(a.obs.t)); j.prix.push(a.prix); j.annonces++; }
@@ -319,25 +374,25 @@ function ficheObjet(id) {
   const jours = Object.keys(parJour).sort();
   const actuels = anns.filter(a => ACTUELS.has(a.obs.id)), prixAct = actuels.map(a => a.prix), tous = anns.map(a => a.prix);
   const nbVentes = ventes.reduce((s, v) => s + v[4], 0);
-  const tuile = (l, v) => `<div class="tuile"><small>${l}</small><b>${v}</b></div>`;
+  const tuile = (l, v) => `<div class="tuile"><small>${t(l)}</small><b>${v}</b></div>`;
   const uniques = {};
   for (const a of anns) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
   const liste = Object.values(uniques).sort((a, b) => (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (b.obs.t - a.obs.t));
-  $("#o-contenu").innerHTML = `<div class="fiche-tete"><h2>${echap(nomObjet(id))}</h2><span class="meta">${liste.length} annonce${liste.length > 1 ? "s" : ""} suivie${liste.length > 1 ? "s" : ""}</span></div>
-    <div class="tuiles">${tuile("En vente maintenant", actuels.length)}${tuile("Moins cher actuel", prixAct.length ? court(Math.min(...prixAct)) + " z" : "—")}
-      ${tuile("Prix médian (historique)", court(mediane(tous)) + " z")}${tuile("Fourchette vue", court(Math.min(...tous)) + " – " + court(Math.max(...tous)))}${tuile("Ventes probables", nbVentes)}</div>
+  $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}</h2><span class="meta">${t("annonces_suivies", liste.length)}</span></div>
+    <div class="tuiles">${tuile("t_vente", actuels.length)}${tuile("t_moins_cher", prixAct.length ? court(Math.min(...prixAct)) + " z" : "—")}
+      ${tuile("t_mediane", court(mediane(tous)) + " z")}${tuile("t_fourchette", court(Math.min(...tous)) + " – " + court(Math.max(...tous)))}${tuile("t_ventes", nbVentes)}</div>
     <div class="graph"><canvas id="o-graph"></canvas></div>
-    <table><tr><th>Objet</th><th style="text-align:right">Prix</th><th>Shop</th><th>Présence</th><th>Statut</th></tr>${liste.map(a =>
+    <table><tr><th>${t("c_objet")}</th><th style="text-align:right">${t("c_prix")}</th><th>Shop</th><th>${t("c_presence")}</th><th>${t("c_statut")}</th></tr>${liste.map(a =>
       `<tr><td>${nomComplet(a, false)}${affixes(a)}</td><td class="prix">${z(a.prix)}</td><td>${echap(a.obs.titre)}</td><td class="meta">${vue(a)}</td><td>${statut(a)}</td></tr>`).join("")}</table>`;
   const css = getComputedStyle(document.documentElement), c = n => css.getPropertyValue(n).trim();
   Chart.defaults.font.family = "Inter, system-ui, sans-serif";
   if (graphique) graphique.destroy();
   graphique = new Chart($("#o-graph"), {
     data: { labels: jours.map(j => j.slice(8, 10) + "/" + j.slice(5, 7)), datasets: [
-      { type: "line", label: "Prix minimum", data: jours.map(j => parJour[j].prix.length ? Math.min(...parJour[j].prix) : null), borderColor: c("--accent"), backgroundColor: c("--accent"), yAxisID: "y", spanGaps: true, tension: .25, pointRadius: 4, borderWidth: 2.5 },
-      { type: "line", label: "Prix médian", data: jours.map(j => parJour[j].prix.length ? mediane(parJour[j].prix) : null), borderColor: c("--bleu"), backgroundColor: c("--bleu"), borderDash: [6, 4], yAxisID: "y", spanGaps: true, tension: .25, pointRadius: 3, borderWidth: 2 },
-      { type: "bar", label: "Annonces vues", data: jours.map(j => parJour[j].annonces), backgroundColor: c("--ligne"), borderRadius: 4, yAxisID: "v", maxBarThickness: 28 },
-      { type: "bar", label: "Ventes probables", data: jours.map(j => parJour[j].ventes), backgroundColor: c("--vert"), borderRadius: 4, yAxisID: "v", maxBarThickness: 28 } ] },
+      { type: "line", label: t("g_min"), data: jours.map(j => parJour[j].prix.length ? Math.min(...parJour[j].prix) : null), borderColor: c("--accent"), backgroundColor: c("--accent"), yAxisID: "y", spanGaps: true, tension: .25, pointRadius: 4, borderWidth: 2.5 },
+      { type: "line", label: t("g_mediane"), data: jours.map(j => parJour[j].prix.length ? mediane(parJour[j].prix) : null), borderColor: c("--bleu"), backgroundColor: c("--bleu"), borderDash: [6, 4], yAxisID: "y", spanGaps: true, tension: .25, pointRadius: 3, borderWidth: 2 },
+      { type: "bar", label: t("g_annonces"), data: jours.map(j => parJour[j].annonces), backgroundColor: c("--ligne"), borderRadius: 4, yAxisID: "v", maxBarThickness: 28 },
+      { type: "bar", label: t("g_ventes"), data: jours.map(j => parJour[j].ventes), backgroundColor: c("--vert"), borderRadius: 4, yAxisID: "v", maxBarThickness: 28 } ] },
     options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
       plugins: { legend: { position: "bottom", labels: { color: c("--doux"), usePointStyle: true, boxWidth: 8 } },
         tooltip: { callbacks: { label: x => " " + x.dataset.label + " : " + (x.dataset.yAxisID === "y" ? nombre(x.raw) + " z" : x.raw) } } },
@@ -346,14 +401,13 @@ function ficheObjet(id) {
         v: { position: "right", beginAtZero: true, ticks: { color: c("--tres-doux"), precision: 0 }, grid: { display: false }, border: { display: false } } } } });
 }
 
-// ---------- navigation, theme ----------
+// ---------- navigation, theme, langue ----------
 function activer(p) {
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("actif", b.dataset.p === p));
   document.querySelectorAll(".panneau").forEach(s => s.classList.toggle("actif", s.id === "p-" + p));
   try { localStorage.setItem("onglet", p); } catch (e) {}
   if (p !== "objet") history.replaceState(null, "", "#" + p);
 }
-// liens directs : #actuels, #recherche, #objet=<id> (partageables)
 function suivreLien() {
   const h = location.hash.slice(1);
   if (h.startsWith("objet=")) { ficheObjet(+h.slice(6)); return true; }
@@ -366,16 +420,29 @@ document.querySelector("nav").onclick = e => { const p = e.target.dataset.p; if 
 document.body.addEventListener("click", e => { const b = e.target.closest("[data-objet]"); if (b) ficheObjet(+b.dataset.objet); });
 $("#f-shops").oninput = afficherShops; $("#tri-shops").onchange = afficherShops;
 ["#r-nom", "#r-raff", "#r-actuel"].forEach(s => $(s).oninput = rechercher);
-$("#r-ajout").onclick = () => { const t = $("#r-type").value; if (!t) return; filtres.push({ type: t, min: +$("#r-val").value || 0 }); $("#r-type").value = ""; afficherFiltres(); rechercher(); };
+$("#r-ajout").onclick = () => {
+  const ty = $("#r-type").value; if (!ty) return;
+  const a = ANN.find(x => x.options.some(([id]) => typeOption(id) === ty)); if (!a) return;
+  const id = a.options.find(([i]) => typeOption(i) === ty)[0];
+  filtres.push({ id, min: +$("#r-val").value || 0 }); $("#r-type").value = ""; afficherFiltres(); rechercher();
+};
 $("#r-filtres").onclick = e => { const i = e.target.dataset.suppr; if (i != null) { filtres.splice(+i, 1); afficherFiltres(); rechercher(); } };
 $("#o-nom").onchange = () => { const n = $("#o-nom").value; const a = ANN.find(x => nomObjet(x.objet) === n); if (a) ficheObjet(a.objet); };
-function appliquerTheme(t) { if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme; }
+function appliquerTheme(th) { if (th) document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme; }
 try { appliquerTheme(localStorage.getItem("theme")); } catch (e) {}
 $("#theme").onclick = () => {
   const sombre = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  const t = sombre ? "light" : "dark"; appliquerTheme(t); try { localStorage.setItem("theme", t); } catch (e) {}
-  if (graphique && $("#o-nom").value) { const a = ANN.find(x => nomObjet(x.objet) === $("#o-nom").value); if (a) ficheObjet(a.objet); }
+  const th = sombre ? "light" : "dark"; appliquerTheme(th); try { localStorage.setItem("theme", th); } catch (e) {}
+  if (objetCourant && $("#p-objet").classList.contains("actif")) ficheObjet(objetCourant);
 };
+function toutAfficher() {
+  traduirePage();
+  if (!D) return;
+  textesLangue(); afficherFiltres(); afficherShops(); rechercher();
+  if (objetCourant) { $("#o-nom").value = nomObjet(objetCourant); if ($("#p-objet").classList.contains("actif")) ficheObjet(objetCourant); }
+  else $("#o-contenu").innerHTML = `<div class="vide">${t("fiche_vide")}</div>`;
+}
+$("#langue").onclick = () => { LANGUE = 1 - LANGUE; try { localStorage.setItem("langue", LANGUE ? "fr" : "en"); } catch (e) {} toutAfficher(); };
 
 // ---------- chargement (en clair en local, chiffre une fois publie) ----------
 async function dechiffrer(paquet, mdp) {
@@ -386,14 +453,15 @@ async function dechiffrer(paquet, mdp) {
   return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(paquet.iv) }, cle, b(paquet.donnees))));
 }
 function demarrer(donnees) {
-  D = donnees; preparer(); afficherShops(); rechercher();
+  D = donnees; preparer(); toutAfficher();
   if (suivreLien()) return;
   let o = "actuels"; try { o = localStorage.getItem("onglet") || o; } catch (e) {}
   activer(["actuels", "recherche"].includes(o) ? o : "actuels");
 }
+traduirePage(); $("#entete").textContent = t("chargement");
 (async () => {
   const r = await fetch("donnees/market.json", { cache: "no-store" });
-  if (!r.ok) { $("#entete").textContent = "Données introuvables."; return; }
+  if (!r.ok) { $("#entete").textContent = t("donnees_absentes"); return; }
   const paquet = await r.json();
   if (!paquet.chiffre) { demarrer(paquet); return; }
   $("#verrou").style.display = "flex";
@@ -401,7 +469,7 @@ function demarrer(donnees) {
   let m = null; try { m = sessionStorage.getItem("mdp"); } catch (e) {}
   if (m && await essayer(m)) return;
   $("#form-mdp").onsubmit = async e => { e.preventDefault(); $("#mdp-err").textContent = "";
-    if (!await essayer($("#mdp").value)) $("#mdp-err").textContent = "Mot de passe incorrect."; };
+    if (!await essayer($("#mdp").value)) $("#mdp-err").textContent = t("mdp_faux"); };
   $("#mdp").focus();
 })();
 </script>

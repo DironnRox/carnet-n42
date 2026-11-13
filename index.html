@@ -254,7 +254,7 @@ const T = {
   raff_min: ["Min. refine", "Raffinage min."], emplacements: ["Card slots", "Emplacements"],
   prix: ["Price (e.g. 200k, 1.5m)", "Prix (ex. 200k, 1,5m)"], prix_min: ["min", "min"], prix_max: ["max", "max"],
   affixes: ["Random options", "Affixes"], choisir_type: ["Choose an option type…", "Choisir un type d'affixe…"],
-  affixes_aide: ["Only options seen on items of the selected category are listed.", "Seuls les affixes vus sur les objets de la catégorie choisie sont proposés."],
+  affixes_aide: ["Picking an option applies it at once; the number sets its minimum. Only options seen on items of the selected category are listed.", "Choisir un affixe l'applique aussitôt ; le nombre fixe son minimum. Seuls les affixes vus sur les objets de la catégorie choisie sont proposés."],
   ajouter: ["Add", "Ajouter"], en_vente_seul: ["Currently for sale only", "En vente actuellement seulement"],
   affichage: ["Display", "Affichage"], par_objet: ["By item", "Par objet"], par_annonce: ["All listings", "Toutes les annonces"],
   trier: ["Sort by", "Trier par"], tri_prix: ["Price ↑", "Prix ↑"], tri_prix_desc: ["Price ↓", "Prix ↓"], tri_recent: ["Most recent", "Plus récent"],
@@ -541,7 +541,13 @@ document.body.addEventListener("click", e => {
 ["#r-nom", "#r-raff", "#r-pmin", "#r-pmax"].forEach(s => $(s).addEventListener("input", rechercher));
 ["#r-slots", "#r-actuel", "#r-tri", "#r-sous"].forEach(s => $(s).addEventListener("change", () => { lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); }));
 $("#r-groupe").addEventListener("change", () => { $("#r-sous").value = ""; remplirSousTypes(); lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); });
-$("#r-ajout").onclick = () => { const id = +$("#r-type").value; if (!id) return; S.filtres.push({ id, min: +$("#r-val").value || 0 }); $("#r-type").value = ""; if (S.tri === "prix") $("#r-tri").value = "affixe"; afficherFiltres(); rechercher(); };
+// choisir un type d'affixe l'applique tout de suite (avant, il fallait cliquer « Ajouter » et la recherche enregistree le perdait) ;
+// la valeur minimale modifie ensuite le dernier affixe ajoute
+let dernierFiltre = null;
+function ajouterFiltre() { const id = +$("#r-type").value; if (!id) return; dernierFiltre = { id, min: +$("#r-val").value || 0 }; S.filtres.push(dernierFiltre); $("#r-type").value = ""; if (S.tri === "prix") $("#r-tri").value = "affixe"; afficherFiltres(); rechercher(); }
+$("#r-type").addEventListener("change", ajouterFiltre);
+$("#r-ajout").onclick = ajouterFiltre;
+$("#r-val").addEventListener("input", () => { if (dernierFiltre && S.filtres.includes(dernierFiltre)) { dernierFiltre.min = +$("#r-val").value || 0; afficherFiltres(); rechercher(); } });
 $("#r-filtres").onclick = e => { const i = e.target.dataset.suppr; if (i != null) { S.filtres.splice(+i, 1); afficherFiltres(); rechercher(); } };
 $("#b-sauver").onclick = () => { $("#f-sauver").style.display = "flex"; $("#nom-sauver").value = S.nom || ""; $("#nom-sauver").focus(); };
 $("#f-sauver").onsubmit = e => { e.preventDefault(); const n = $("#nom-sauver").value.trim(); if (!n) return; lireFormulaire();

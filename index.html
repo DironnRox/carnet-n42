@@ -189,6 +189,7 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 .repere.kafra { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--bleu); box-shadow: none; }
 .repere-txt { position: absolute; transform: translate(-50%, -150%); font-size: 11px; font-weight: 600; color: #1c1b19; background: rgba(255, 255, 255, .85); border-radius: 4px; padding: 0 4px; white-space: nowrap; }
 .jamais { color: var(--doux); font-size: 13px; }
+.slots { margin-left: 5px; font-weight: 600; color: var(--bleu); font-variant-numeric: tabular-nums; }
 /* telephone : rien ne doit deborder (une longue option d'affixe imposait sa largeur au panneau) */
 select { max-width: 100%; }
 @media (max-width: 860px) {
@@ -405,8 +406,10 @@ function statut(a) {
   if (d) return `<span class="puce p-ancien">${t(d[2] in T ? d[2] : "absent", date(d[1]))}</span>`;
   return `<span class="puce p-ancien">${t("ancienne")}</span>`;
 }
-const lienObjet = id => `<button class="lien" data-objet="${id}">${echap(nomObjet(id))}</button>`;
-const nomComplet = (a, lien = true) => `<span class="nom-objet">${icone(a.objet)}${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${lien ? lienObjet(a.objet) : `<b>${echap(nomObjet(a.objet))}</b>`}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}</span>`;
+// emplacements de carte, comme dans le jeu : « Saber [2] »
+const slots = id => slotsObjet(id) ? `<span class="slots">[${slotsObjet(id)}]</span>` : "";
+const lienObjet = id => `<button class="lien" data-objet="${id}">${echap(nomObjet(id))}</button>${slots(id)}`;
+const nomComplet = (a, lien = true) => `<span class="nom-objet">${icone(a.objet)}${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${lien ? lienObjet(a.objet) : `<b>${echap(nomObjet(a.objet))}</b>${slots(a.objet)}`}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}</span>`;
 function affixes(a, surligner = []) {
   const opts = a.options.map(([id, v]) => `<span class="affixe${surligner.includes(typeOption(id)) ? " match" : ""}">${echap(texteOption(id, v))}</span>`);
   const cartes = a.cartes.filter(c => D.objets[c]).map(c => `<span class="affixe carte">${echap(nomObjet(c))}</span>`);
@@ -592,7 +595,7 @@ function ficheObjet(id) {
   objetCourant = id; montrer("objet"); history.replaceState(null, "", "#objet=" + id);
   const anns = ANN.filter(a => a.objet === id), ventes = D.ventes.filter(v => v[2] === id);
   if (!anns.length) {      // objet du catalogue jamais vu au market
-    $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}</h2><span class="meta">${echap(libSousType(id) || t("g_" + groupeObjet(id)))}</span></div>
+    $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}${slots(id)}</h2><span class="meta">${echap(libSousType(id) || t("g_" + groupeObjet(id)))}</span></div>
       <div class="vide">${t("jamais_vu")}</div>`;
     return;
   }
@@ -607,7 +610,7 @@ function ficheObjet(id) {
   const uniques = {};
   for (const a of anns) { const k = a.obs.aid + "|" + a.sig; if (!uniques[k] || uniques[k].obs.t < a.obs.t) uniques[k] = a; }
   const liste = Object.values(uniques).sort((a, b) => (ACTUELS.has(b.obs.id) - ACTUELS.has(a.obs.id)) || (a.prix - b.prix));
-  $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}</h2><span class="meta">${echap(libSousType(id) || t("g_" + groupeObjet(id)))} · ${t("annonces_suivies", liste.length)}</span></div>
+  $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}${slots(id)}</h2><span class="meta">${echap(libSousType(id) || t("g_" + groupeObjet(id)))} · ${t("annonces_suivies", liste.length)}</span></div>
     <div class="tuiles">${tuile("t_vente", actuels.length)}${tuile("t_moins_cher", prixAct.length ? court(Math.min(...prixAct)) + " z" : "—")}
       ${tuile("t_mediane", court(mediane(tous)) + " z")}${tuile("t_fourchette", court(Math.min(...tous)) + " – " + court(Math.max(...tous)))}${tuile("t_ventes", nbVentes)}</div>
     <div class="graph"><canvas id="o-graph"></canvas></div>

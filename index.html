@@ -166,6 +166,36 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 .cat { font-size: 11.5px; color: var(--doux); }
 .retour { margin-bottom: 14px; }
 @media (max-width: 860px) { .filtres { max-height: none; position: static; } .ligne-objet .tete-ligne { grid-template-columns: 1fr; } .ligne-objet .chiffres-l { text-align: left; } }
+/* ---- categories en pastilles ---- */
+.cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.cat-btn { border: 1px solid var(--ligne); background: var(--surface); border-radius: 999px; padding: 6px 12px; cursor: pointer; color: var(--texte); font-weight: 500; font-size: 13px; display: inline-flex; gap: 6px; align-items: baseline; box-shadow: var(--ombre); }
+.cat-btn small { color: var(--tres-doux); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.cat-btn:hover { border-color: var(--accent); }
+.cat-btn.actif { background: var(--accent); border-color: var(--accent); color: #fff; }
+.cat-btn.actif small { color: rgba(255, 255, 255, .8); }
+@media (max-width: 860px) { .cats { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; } .cat-btn { flex: none; } }
+/* ---- position du shop ---- */
+.pin { border: 1px solid var(--ligne); background: var(--surface-2); border-radius: 999px; padding: 1px 9px; font-size: 12px; color: var(--doux); cursor: pointer; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pin:hover { border-color: var(--accent); color: var(--accent); }
+#plan { position: fixed; inset: 0; background: rgba(0, 0, 0, .45); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+#plan.ouvert { display: flex; }
+#plan .boite { background: var(--surface); border: 1px solid var(--ligne); border-radius: 16px; box-shadow: var(--ombre); padding: 16px; width: min(420px, 100%); display: grid; gap: 10px; }
+#plan .boite h3 { margin: 0; font-size: 15px; word-break: break-word; }
+.carte-plan { position: relative; width: 100%; aspect-ratio: 360 / 320; border-radius: 10px; overflow: hidden; border: 1px solid var(--ligne); }
+.carte-plan img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+:root[data-theme="dark"] .carte-plan img { filter: invert(.88) hue-rotate(180deg); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .carte-plan img { filter: invert(.88) hue-rotate(180deg); } }
+.repere { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--rouge); border: 2px solid #fff; box-shadow: 0 0 0 3px rgba(176, 58, 58, .35); }
+.repere.kafra { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--bleu); box-shadow: none; }
+.repere-txt { position: absolute; transform: translate(-50%, -150%); font-size: 11px; font-weight: 600; color: #1c1b19; background: rgba(255, 255, 255, .85); border-radius: 4px; padding: 0 4px; white-space: nowrap; }
+.jamais { color: var(--doux); font-size: 13px; }
+/* telephone : rien ne doit deborder (une longue option d'affixe imposait sa largeur au panneau) */
+select { max-width: 100%; }
+@media (max-width: 860px) {
+  .disposition { grid-template-columns: minmax(0, 1fr); }
+  .filtres { min-width: 0; }
+  header > div:last-child { align-items: flex-start !important; width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -187,6 +217,7 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 
   <!-- ===================== MARKET (recherche) ===================== -->
   <section class="vue active" id="vue-market">
+    <div class="cats" id="r-groupes"></div>
     <div class="disposition">
       <aside class="filtres">
         <div class="bloc">
@@ -202,8 +233,7 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
         </div>
         <div><label class="titre" for="r-nom" data-t="objet"></label><input id="r-nom" type="search" list="noms" data-tp="nom_vide"></div>
         <datalist id="noms"></datalist>
-        <div class="bloc"><label class="titre" for="r-groupe" data-t="categorie"></label>
-          <select id="r-groupe"></select><select id="r-sous"></select></div>
+        <div class="bloc" id="bloc-sous"><label class="titre" for="r-sous" data-t="sous_type"></label><select id="r-sous"></select></div>
         <div class="deux">
           <div><label class="titre" for="r-raff" data-t="raff_min"></label><input id="r-raff" type="number" min="0" max="20" value="0"></div>
           <div><label class="titre" data-t="emplacements"></label><select id="r-slots"><option value="">—</option><option value="1">≥ 1</option><option value="2">≥ 2</option><option value="3">≥ 3</option><option value="4">4</option></select></div>
@@ -232,6 +262,14 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
   </section>
 </div>
 
+<!-- plan du market : position d'un shop -->
+<div id="plan"><div class="boite">
+  <h3 id="plan-titre"></h3>
+  <div class="carte-plan" id="plan-carte"><img src="plan_market.png" alt=""></div>
+  <div class="petit" id="plan-legende"></div>
+  <button class="bouton discret" id="plan-fermer" data-t="fermer"></button>
+</div></div>
+
 <script>
 "use strict";
 // ---------- traductions (anglais par defaut) ----------
@@ -254,7 +292,16 @@ const T = {
   raff_min: ["Min. refine", "Raffinage min."], emplacements: ["Card slots", "Emplacements"],
   prix: ["Price (e.g. 200k, 1.5m)", "Prix (ex. 200k, 1,5m)"], prix_min: ["min", "min"], prix_max: ["max", "max"],
   affixes: ["Random options", "Affixes"], choisir_type: ["Choose an option type…", "Choisir un type d'affixe…"],
-  affixes_aide: ["Picking an option applies it at once; the number sets its minimum. Only options seen on items of the selected category are listed.", "Choisir un affixe l'applique aussitôt ; le nombre fixe son minimum. Seuls les affixes vus sur les objets de la catégorie choisie sont proposés."],
+  affixes_aide: ["Picking an option applies it at once; the number sets its minimum. With a category selected, only options possible on it are listed (per midgardhub.com, plus those seen here).", "Choisir un affixe l'applique aussitôt ; le nombre fixe son minimum. Avec une catégorie choisie, seuls les affixes possibles sur celle-ci sont proposés (d'après midgardhub.com, plus ceux vus ici)."],
+  sous_type: ["Type", "Type"], toutes: ["All", "Toutes"], fermer: ["Close", "Fermer"],
+  position: ["Position", "Position"], plan_legende: ["Red dot: the shop ({0}, {1}). Blue dot: Kafra (162, 149). North is up.", "Point rouge : le shop ({0}, {1}). Point bleu : Kafra (162, 149). Le nord est en haut."],
+  plan_hors: ["Position outside the map: {0}, {1}.", "Position hors du plan : {0}, {1}."], pos_inconnue: ["position unknown", "position inconnue"],
+  jamais_vu: ["Not seen on the market yet.", "Pas encore vu sur le market."],
+  jamais_vus: ["Never seen on the market yet: {0}", "Jamais vus sur le market pour l'instant : {0}"],
+  f_stats: ["Stats, HP & SP", "Statistiques, PV et PM"], f_combat: ["Attack, defense & speed", "Attaque, défense et vitesse"],
+  f_phys: ["Physical damage", "Dégâts physiques"], f_mag: ["Magical damage", "Dégâts magiques"], f_crit: ["Critical against…", "Critique contre…"],
+  f_ignore: ["Ignore defense", "Ignorer la défense"], f_defense: ["Resistances & damage taken", "Résistances et dégâts reçus"],
+  f_elem: ["Elemental property", "Élément de l'équipement"], f_divers: ["Healing, casting & misc.", "Soins, incantation et divers"], f_exp: ["Experience", "Expérience"],
   ajouter: ["Add", "Ajouter"], en_vente_seul: ["Currently for sale only", "En vente actuellement seulement"],
   affichage: ["Display", "Affichage"], par_objet: ["By item", "Par objet"], par_annonce: ["All listings", "Toutes les annonces"],
   trier: ["Sort by", "Trier par"], tri_prix: ["Price ↑", "Prix ↑"], tri_prix_desc: ["Price ↓", "Prix ↓"], tri_recent: ["Most recent", "Plus récent"],
@@ -302,7 +349,7 @@ const date = ts => new Date(ts * 1000).toLocaleString(LOCALE(), { day: "2-digit"
 const jour = ts => { const d = new Date(ts * 1000); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const ilya = ts => { const s = Date.now() / 1000 - ts; return s < 3600 ? t("il_y_a_min", Math.max(1, Math.round(s / 60))) : s < 86400 ? t("il_y_a_h", Math.round(s / 3600)) : t("il_y_a_j", Math.round(s / 86400)); };
 const echap = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const infoObjet = id => D.objets[id] || [];
+const infoObjet = id => D.objets[id] || (D.catalogue || {})[id] || [];   // catalogue = objets echangeables jamais vus
 const nomObjet = id => infoObjet(id)[LANGUE] || ((LANGUE ? "objet " : "item ") + id);
 const groupeObjet = id => infoObjet(id)[4] || "divers";
 const sousType = id => infoObjet(id)[5] || "";
@@ -371,12 +418,12 @@ const ETAT_VIDE = { nom: "", groupe: "", sous: "", raff: 0, slots: "", pmin: "",
 let S = JSON.parse(JSON.stringify(ETAT_VIDE));
 const deplies = new Set();
 function lireFormulaire() {
-  S.nom = $("#r-nom").value.trim(); S.groupe = $("#r-groupe").value; S.sous = $("#r-sous").value;
+  S.nom = $("#r-nom").value.trim(); S.sous = $("#r-sous").value;          // S.groupe : pastilles de categorie
   S.raff = +$("#r-raff").value || 0; S.slots = $("#r-slots").value; S.pmin = $("#r-pmin").value.trim(); S.pmax = $("#r-pmax").value.trim();
   S.actuel = $("#r-actuel").checked; S.tri = $("#r-tri").value;
 }
 function ecrireFormulaire() {
-  $("#r-nom").value = S.nom; remplirCategories(); $("#r-groupe").value = S.groupe; remplirSousTypes(); $("#r-sous").value = S.sous;
+  $("#r-nom").value = S.nom; remplirCategories(); remplirSousTypes(); $("#r-sous").value = S.sous;
   $("#r-raff").value = S.raff; $("#r-slots").value = S.slots; $("#r-pmin").value = S.pmin; $("#r-pmax").value = S.pmax;
   $("#r-actuel").checked = S.actuel; $("#r-tri").value = S.tri;
   document.querySelectorAll(".segment button").forEach(b => b.classList.toggle("actif", b.dataset.mode === S.mode));
@@ -389,26 +436,60 @@ const decoder = c => { try { return Object.assign(JSON.parse(JSON.stringify(ETAT
 function annoncesCategorie(groupe, sous) {
   return ANN.filter(a => (!groupe || groupeObjet(a.objet) === groupe) && (!sous || sousType(a.objet) === sous));
 }
+// categories en pastilles (avec le nombre d'annonces en vente) : clic = S.groupe
 function remplirCategories() {
-  const presents = new Set(ANN.map(a => groupeObjet(a.objet)));
-  $("#r-groupe").innerHTML = `<option value="">${t("toutes_cat")}</option>` + GROUPES.filter(g => presents.has(g)).map(g => `<option value="${g}">${t("g_" + g)}</option>`).join("");
+  const n = {};
+  for (const a of ANN) if (ACTUELS.has(a.obs.id)) n[groupeObjet(a.objet)] = (n[groupeObjet(a.objet)] || 0) + 1;
+  const total = Object.values(n).reduce((s, x) => s + x, 0);
+  const pastille = (g, lib, nb) => `<button class="cat-btn${S.groupe === g ? " actif" : ""}" data-groupe="${g}">${lib}<small>${nombre(nb || 0)}</small></button>`;
+  $("#r-groupes").innerHTML = pastille("", t("toutes"), total) + GROUPES.map(g => pastille(g, t("g_" + g), n[g])).join("");
 }
+// sous-types (Dague, Arc, Livre...) de la categorie, d'apres tous les objets connus (vus + catalogue)
 function remplirSousTypes() {
-  const g = $("#r-groupe").value;
-  const sous = {};
-  if (g) for (const a of ANN) if (groupeObjet(a.objet) === g && sousType(a.objet)) sous[sousType(a.objet)] = libSousType(a.objet);
-  const cles = Object.keys(sous).sort((a, b) => sous[a].localeCompare(sous[b], LOCALE()));
+  const g = S.groupe, sous = {};
+  if (g) for (const id of [...Object.keys(D.objets), ...Object.keys(D.catalogue || {})])
+    if (groupeObjet(id) === g && sousType(id)) sous[sousType(id)] = libSousType(id);
+  const cles = Object.keys(sous).sort((a, b) => sous[a].localeCompare(sous[b], LOCALE(), { sensitivity: "base" }));
   $("#r-sous").innerHTML = `<option value="">${t("tous_types")}</option>` + cles.map(k => `<option value="${echap(k)}">${echap(sous[k])}</option>`).join("");
-  $("#r-sous").style.display = cles.length > 1 ? "" : "none";
+  if (!sous[S.sous]) S.sous = "";
+  $("#bloc-sous").style.display = cles.length > 1 ? "" : "none";
 }
-// affixes proposes = types reellement vus sur les objets de la categorie choisie (une armure ne propose pas « degats + »)
+// famille d'un affixe (d'apres son gabarit anglais) pour regrouper la liste deroulante
+const FAMILLES = ["stats", "combat", "phys", "mag", "crit", "ignore", "defense", "elem", "divers", "exp"];
+function familleOption(id) {
+  const en = (D.options[id] || [""])[0];
+  if (/^Enchant /.test(en)) return "elem";
+  if (/^Ignore /.test(en)) return "ignore";
+  if (/^EXP /.test(en)) return "exp";
+  if (/Taken|^Reflect|Resistance/.test(en)) return "defense";
+  if (/^CRI against/.test(en)) return "crit";
+  if (/^(Physical Damage|Melee Physical|Ranged)/.test(en)) return "phys";
+  if (/Magical Damage/.test(en)) return "mag";
+  if (/^(STR|AGI|VIT|INT|DEX|LUK|POW|SPL|STA|WIS|CON|CRT|MHP|MSP) /.test(en)) return "stats";
+  if (/^(ATK|MATK|M\.ATK|P\.ATK|S\.MATK|ASPD|HIT|CRI|Critical Damage|C\.RATE|H\.PLUS|Perfect Dodge|FLEE|DEF|MDEF|RES|MRES) /.test(en)) return "combat";
+  return "divers";
+}
+// affixes proposes : sans categorie, tous ; avec une categorie, ceux POSSIBLES sur elle (midgardhub, TWRo Zero)
+// + ceux deja VUS sur ses objets au market (corrige les ecarts avec l'EU). Groupes par famille, ordre alphabetique.
+function affixesProposes() {
+  if (!S.groupe) return Object.keys(D.options).map(Number);
+  const ids = new Set((D.affixes_possibles || {})[S.groupe] || []);
+  for (const a of annoncesCategorie(S.groupe, S.sous)) for (const [id] of a.options) ids.add(id);
+  return [...ids];
+}
 function remplirAffixes() {
   const types = {};
-  for (const a of annoncesCategorie(S.groupe, S.sous)) for (const [id] of a.options) types[typeOption(id)] = id;
-  const tries = Object.keys(types).sort((a, b) => a.localeCompare(b, LOCALE()));
-  $("#r-type").innerHTML = `<option value="">${t("choisir_type")}</option>` + tries.map(x => `<option value="${types[x]}">${echap(x)}</option>`).join("");
+  for (const id of affixesProposes()) if (D.options[id]) types[typeOption(id)] ??= id;
+  const parFamille = {};
+  for (const [x, id] of Object.entries(types)) (parFamille[familleOption(id)] ??= []).push([x, id]);
+  const comparer = (a, b) => a[0].localeCompare(b[0], LOCALE(), { sensitivity: "base", numeric: true });
+  $("#r-type").innerHTML = `<option value="">${t("choisir_type")}</option>` + FAMILLES.filter(f => parFamille[f]).map(f =>
+    `<optgroup label="${echap(t("f_" + f))}">${parFamille[f].sort(comparer).map(([x, id]) => `<option value="${id}">${echap(x)}</option>`).join("")}</optgroup>`).join("");
   // les filtres d'affixes devenus impossibles dans cette categorie sont retires
   S.filtres = S.filtres.filter(f => types[typeOption(f.id)] !== undefined);
+}
+function choisirGroupe(g) {
+  S.groupe = g; S.sous = ""; remplirCategories(); remplirSousTypes(); remplirAffixes(); afficherFiltres(); rechercher();
 }
 function afficherFiltres() {
   $("#r-filtres").innerHTML = S.filtres.map((f, i) => `<span class="actif-f">${echap(typeOption(f.id).replace(/[+-]?X/, "≥ " + f.min))}<button data-suppr="${i}">×</button></span>`).join("");
@@ -446,7 +527,7 @@ function rechercher() {
   const parObjet = {};
   for (const a of annonces) (parObjet[a.objet] ??= []).push(a);
   const nbObjets = Object.keys(parObjet).length;
-  $("#r-compte").textContent = t("resultats_objets", nbObjets, annonces.length);
+  $("#r-compte").innerHTML = echap(t("resultats_objets", nbObjets, annonces.length)) + jamaisVus(nom);
   if (!annonces.length) { $("#r-res").innerHTML = `<div class="vide">${t("aucun_resultat")}</div>`; return; }
   if (S.mode === "annonce") {
     $("#r-res").innerHTML = annonces.slice(0, 200).map(a => carteAnnonce(a, types, true)).join("") + (annonces.length > 200 ? `<p class="compte">${t("premiers")}</p>` : "");
@@ -472,10 +553,35 @@ function rechercher() {
       ${ouvert ? `<div class="annonces-objet">${o.l.map(a => carteAnnonce(a, types, false)).join("")}</div>` : ""}</div>`;
   }).join("") + (lignes.length > 200 ? `<p class="compte">${t("premiers")}</p>` : "");
 }
+// objets du catalogue dont le nom correspond a la recherche mais jamais vus au market (liens vers leur fiche)
+function jamaisVus(nom) {
+  if (nom.length < 3) return "";
+  const vus = new Set(ANN.map(a => a.objet));
+  const ids = Object.keys(D.catalogue || {}).map(Number).filter(id => !vus.has(id) && nomObjet(id).toLowerCase().includes(nom)
+    && (!S.groupe || groupeObjet(id) === S.groupe) && (!S.sous || sousType(id) === S.sous));
+  if (!ids.length) return "";
+  ids.sort((a, b) => nomObjet(a).localeCompare(nomObjet(b), LOCALE()));
+  const liens = ids.slice(0, 12).map(lienObjet).join(", ") + (ids.length > 12 ? "…" : "");
+  return `<br><span class="jamais">${t("jamais_vus", liens)}</span>`;
+}
+// pastille de position d'un shop (clic = plan du market)
+const pin = obs => obs.x ? `<button class="pin" data-plan="${obs.id}" title="${t("position")}">📍 ${obs.x}, ${obs.y}</button>` : "";
+const PLAN = { x0: 118, x1: 208, y0: 104, y1: 184 };      // cases couvertes par plan_market.png (outils/plan_site.py)
+function ouvrirPlan(obsId) {
+  const o = OBS[obsId]; if (!o) return;
+  const pc = (x, y) => [((x - PLAN.x0 + .5) / (PLAN.x1 - PLAN.x0) * 100).toFixed(2), ((PLAN.y1 - 1 - y + .5) / (PLAN.y1 - PLAN.y0) * 100).toFixed(2)];
+  const dedans = o.x >= PLAN.x0 && o.x < PLAN.x1 && o.y >= PLAN.y0 && o.y < PLAN.y1;
+  const [kx, ky] = pc(162, 149), [sx, sy] = pc(o.x, o.y);
+  $("#plan-titre").textContent = o.titre || "Shop";
+  $("#plan-carte").innerHTML = `<img src="plan_market.png" alt=""><span class="repere kafra" style="left:${kx}%;top:${ky}%"></span>`
+    + (dedans ? `<span class="repere" style="left:${sx}%;top:${sy}%"></span><span class="repere-txt" style="left:${sx}%;top:${sy}%">${o.x}, ${o.y}</span>` : "");
+  $("#plan-legende").textContent = dedans ? t("plan_legende", o.x, o.y) : t("plan_hors", o.x, o.y);
+  $("#plan").classList.add("ouvert");
+}
 function carteAnnonce(a, types, complet) {
   const corps = `<div>${complet ? nomComplet(a) : `<span class="nom-objet">${a.raff ? `<span class="raff">+${a.raff}</span>` : ""}${a.q > 1 ? `<span class="qte">× ${nombre(a.q)}</span>` : ""}</span>`}${affixes(a, types)}</div>
     <div class="prix">${z(a.prix)}</div>
-    <div class="bas">${statut(a)}<span class="meta">${echap(a.obs.titre)}</span><span class="meta">${vue(a)}</span></div>`;
+    <div class="bas">${statut(a)}<span class="meta">${echap(a.obs.titre)}</span>${pin(a.obs)}<span class="meta">${vue(a)}</span></div>`;
   return complet ? `<div class="resultat">${corps}</div>` : `<div class="annonce">${corps}</div>`;
 }
 
@@ -485,7 +591,11 @@ function montrer(v) { document.querySelectorAll(".vue").forEach(s => s.classList
 function ficheObjet(id) {
   objetCourant = id; montrer("objet"); history.replaceState(null, "", "#objet=" + id);
   const anns = ANN.filter(a => a.objet === id), ventes = D.ventes.filter(v => v[2] === id);
-  if (!anns.length) { $("#o-contenu").innerHTML = `<div class="vide">${t("aucune_annonce")}</div>`; return; }
+  if (!anns.length) {      // objet du catalogue jamais vu au market
+    $("#o-contenu").innerHTML = `<div class="fiche-tete">${icone(id, true)}<h2>${echap(nomObjet(id))}</h2><span class="meta">${echap(libSousType(id) || t("g_" + groupeObjet(id)))}</span></div>
+      <div class="vide">${t("jamais_vu")}</div>`;
+    return;
+  }
   const parJour = {};
   const j0 = j => (parJour[j] ??= { prix: [], annonces: 0, ventes: 0 });
   for (const a of anns) { const j = j0(jour(a.obs.t)); j.prix.push(a.prix); j.annonces++; }
@@ -502,7 +612,7 @@ function ficheObjet(id) {
       ${tuile("t_mediane", court(mediane(tous)) + " z")}${tuile("t_fourchette", court(Math.min(...tous)) + " – " + court(Math.max(...tous)))}${tuile("t_ventes", nbVentes)}</div>
     <div class="graph"><canvas id="o-graph"></canvas></div>
     <table><tr><th>${t("c_objet")}</th><th style="text-align:right">${t("c_prix")}</th><th>Shop</th><th>${t("c_presence")}</th><th>${t("c_statut")}</th></tr>${liste.map(a =>
-      `<tr><td>${nomComplet(a, false)}${affixes(a)}</td><td class="prix">${z(a.prix)}</td><td>${echap(a.obs.titre)}</td><td class="meta">${vue(a)}</td><td>${statut(a)}</td></tr>`).join("")}</table>`;
+      `<tr><td>${nomComplet(a, false)}${affixes(a)}</td><td class="prix">${z(a.prix)}</td><td>${echap(a.obs.titre)}<div>${pin(a.obs)}</div></td><td class="meta">${vue(a)}</td><td>${statut(a)}</td></tr>`).join("")}</table>`;
   const css = getComputedStyle(document.documentElement), c = n => css.getPropertyValue(n).trim();
   Chart.defaults.font.family = "Inter, system-ui, sans-serif";
   if (graphique) graphique.destroy();
@@ -526,12 +636,17 @@ function entete() {
   $("#entete").textContent = t("derniere", ilya(D.derniere_tournee), date(D.derniere_tournee));
   $("#stats").innerHTML = [[D.actuels.length, "st_shops"], [enVente, "st_objets"], [ANN.length, "st_annonces"], [D.ventes.length, "st_ventes"]]
     .map(([n, l]) => `<div class="stat"><b>${nombre(n)}</b><small>${t(l)}</small></div>`).join("");
-  $("#noms").innerHTML = [...new Set(ANN.map(a => nomObjet(a.objet)))].sort((a, b) => a.localeCompare(b, LOCALE())).map(n => `<option value="${echap(n)}">`).join("");
+  // autocompletion : objets vus + tous les objets echangeables du catalogue
+  const ids = [...new Set([...ANN.map(a => a.objet), ...Object.keys(D.catalogue || {}).map(Number)])];
+  $("#noms").innerHTML = [...new Set(ids.map(nomObjet))].sort((a, b) => a.localeCompare(b, LOCALE())).map(n => `<option value="${echap(n)}">`).join("");
 }
 
 // ---------- evenements ----------
 document.body.addEventListener("click", e => {
   const o = e.target.closest("[data-objet]"); if (o) { ficheObjet(+o.dataset.objet); return; }
+  const g = e.target.closest("[data-groupe]"); if (g) { choisirGroupe(g.dataset.groupe); return; }
+  const p = e.target.closest("[data-plan]"); if (p) { ouvrirPlan(+p.dataset.plan); return; }
+  if (e.target.id === "plan" || e.target.id === "plan-fermer") { $("#plan").classList.remove("ouvert"); return; }
   const d = e.target.closest("[data-deplier]"); if (d) { const id = +d.dataset.deplier; deplies.has(id) ? deplies.delete(id) : deplies.add(id); rechercher(); return; }
   const c = e.target.closest("[data-commune]"); if (c) { chargerRecherche(D.recherches_communes[+c.dataset.commune].s); return; }
   const s = e.target.closest("[data-sauvee]"); if (s) { chargerRecherche(sauvees()[+s.dataset.sauvee].s); return; }
@@ -540,7 +655,7 @@ document.body.addEventListener("click", e => {
 });
 ["#r-nom", "#r-raff", "#r-pmin", "#r-pmax"].forEach(s => $(s).addEventListener("input", rechercher));
 ["#r-slots", "#r-actuel", "#r-tri", "#r-sous"].forEach(s => $(s).addEventListener("change", () => { lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); }));
-$("#r-groupe").addEventListener("change", () => { $("#r-sous").value = ""; remplirSousTypes(); lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("#plan").classList.remove("ouvert"); });
 // choisir un type d'affixe l'applique tout de suite (avant, il fallait cliquer « Ajouter » et la recherche enregistree le perdait) ;
 // la valeur minimale modifie ensuite le dernier affixe ajoute
 let dernierFiltre = null;

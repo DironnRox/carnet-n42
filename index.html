@@ -165,6 +165,11 @@ th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color:
 .annonce .bas { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }
 .cat { font-size: 11.5px; color: var(--doux); }
 .retour { margin-bottom: 14px; }
+.ligne-contrib { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.segment.periode { grid-template-columns: repeat(3, auto); margin-bottom: 14px; }
+.c-pseudo { font-weight: 600; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.tableau { overflow-x: auto; }
 @media (max-width: 860px) { .filtres { max-height: none; position: static; } .ligne-objet .tete-ligne { grid-template-columns: 1fr; } .ligne-objet .chiffres-l { text-align: left; } }
 /* ---- categories en pastilles ---- */
 .cats { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
@@ -212,7 +217,7 @@ select { max-width: 100%; }
     <div class="marque"><h1 data-t="titre_html"></h1><p id="entete"></p></div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
       <div class="stats" id="stats"></div>
-      <div class="outils"><button class="theme" id="langue" title="Language / Langue"></button><button class="theme" id="theme" data-t="theme"></button></div>
+      <div class="outils"><button class="theme" id="b-contrib" data-t="contributeurs"></button><button class="theme" id="langue" title="Language / Langue"></button><button class="theme" id="theme" data-t="theme"></button></div>
     </div>
   </header>
 
@@ -260,6 +265,15 @@ select { max-width: 100%; }
   <section class="vue" id="vue-objet">
     <button class="bouton discret retour" id="b-retour" data-t="retour"></button>
     <div id="o-contenu"></div>
+  </section>
+
+  <!-- ===================== CONTRIBUTEURS ===================== -->
+  <section class="vue" id="vue-contrib">
+    <div class="ligne-contrib">
+      <button class="bouton discret retour" id="b-retour-c" data-t="retour"></button>
+      <div class="segment periode"><button data-periode="7" data-t="p_7"></button><button data-periode="30" data-t="p_30"></button><button data-periode="0" data-t="p_tout"></button></div>
+    </div>
+    <div id="c-contenu"></div>
   </section>
 </div>
 
@@ -324,6 +338,11 @@ const T = {
   t_fourchette: ["Price range seen", "Fourchette vue"], t_ventes: ["Likely sales", "Ventes probables"],
   g_min: ["Min price", "Prix minimum"], g_mediane: ["Median price", "Prix médian"], g_annonces: ["Listings seen", "Annonces vues"], g_ventes: ["Likely sales", "Ventes probables"],
   c_objet: ["Item", "Objet"], c_prix: ["Price", "Prix"], c_presence: ["Seen", "Présence"], c_statut: ["Status", "Statut"],
+  contributeurs: ["👥 Contributors", "👥 Contributeurs"], p_7: ["7 days", "7 jours"], p_30: ["30 days", "30 jours"], p_tout: ["All time", "Depuis le début"],
+  c_scans: ["Scans sent", "Analyses envoyées"], c_lus: ["Shops read", "Shops lus"], c_apportes: ["Shops added to the site", "Shops apportés au site"],
+  c_actifs: ["Active contributors", "Contributeurs actifs"], c_pseudo: ["Player", "Joueur"], c_jours: ["Active days", "Jours actifs"],
+  c_derniere: ["Last scan", "Dernière analyse"], c_aide: ["“Added” = shop readings kept in the history. A shop re-read unchanged a few minutes after someone else is not counted. Names are the ones typed in ScanMarche.", "« Apportés » = lectures de shops retenues dans l'historique. Un shop relu sans changement quelques minutes après quelqu'un d'autre ne compte pas. Les pseudos sont ceux saisis dans ScanMarche."],
+  c_aucune: ["No scan over this period.", "Aucune analyse sur cette période."], c_graph: ["Shops added per day", "Shops apportés par jour"],
   donnees_absentes: ["Data not found.", "Données introuvables."], chargement: ["Loading…", "Chargement…"],
 };
 const GROUPES = ["arme", "armure", "tete", "cape", "chaussures", "bouclier", "accessoire", "carte", "costume", "familier", "divers"];
@@ -429,7 +448,7 @@ function ecrireFormulaire() {
   $("#r-nom").value = S.nom; remplirCategories(); remplirSousTypes(); $("#r-sous").value = S.sous;
   $("#r-raff").value = S.raff; $("#r-slots").value = S.slots; $("#r-pmin").value = S.pmin; $("#r-pmax").value = S.pmax;
   $("#r-actuel").checked = S.actuel; $("#r-tri").value = S.tri;
-  document.querySelectorAll(".segment button").forEach(b => b.classList.toggle("actif", b.dataset.mode === S.mode));
+  document.querySelectorAll("[data-mode]").forEach(b => b.classList.toggle("actif", b.dataset.mode === S.mode));
   remplirAffixes(); afficherFiltres();
 }
 const encoder = s => btoa(unescape(encodeURIComponent(JSON.stringify(s)))).replace(/=+$/, "");
@@ -633,6 +652,51 @@ function ficheObjet(id) {
         v: { position: "right", beginAtZero: true, ticks: { color: c("--tres-doux"), precision: 0 }, grid: { display: false }, border: { display: false } } } } });
 }
 
+// ---------- contributeurs (D.contributions : [pseudo, debut, fin, shops lus, shops apportes] par analyse envoyee) ----------
+let periodeC = 30, graphContrib = null;
+try { const p = localStorage.getItem("periode"); if (p !== null && ["0", "7", "30"].includes(p)) periodeC = +p; } catch (e) {}
+const COULEURS = ["--accent", "--bleu", "--vert", "#d9922b", "#9b6fd6", "#d0537a", "#3aa9a0", "#7d8590"];
+function pageContrib() {
+  montrer("contrib"); history.replaceState(null, "", "#contrib");
+  document.querySelectorAll("[data-periode]").forEach(b => b.classList.toggle("actif", +b.dataset.periode === periodeC));
+  const depuis = periodeC ? Date.now() / 1000 - periodeC * 86400 : 0;
+  const liste = (D.contributions || []).filter(c => c[1] >= depuis);
+  if (!liste.length) { $("#c-contenu").innerHTML = `<div class="vide">${t("c_aucune")}</div>`; return; }
+  const par = {};
+  for (const [p, debut, fin, lus, app] of liste) {
+    const e = par[p] ??= { p, scans: 0, lus: 0, app: 0, der: 0, jours: new Set() };
+    e.scans++; e.lus += lus; e.app += app; e.der = Math.max(e.der, fin); e.jours.add(jour(debut));
+  }
+  const rang = Object.values(par).sort((a, b) => b.app - a.app || b.scans - a.scans);
+  const somme = k => rang.reduce((s, e) => s + e[k], 0);
+  const tuile = (l, v) => `<div class="tuile"><small>${t(l)}</small><b>${nombre(v)}</b></div>`;
+  const nomP = p => echap(p) + (/-bot$/i.test(p) ? " 🤖" : "");
+  $("#c-contenu").innerHTML = `<div class="tuiles">${tuile("c_actifs", rang.length)}${tuile("c_scans", somme("scans"))}${tuile("c_lus", somme("lus"))}${tuile("c_apportes", somme("app"))}</div>
+    <div class="graph"><canvas id="c-graph"></canvas></div>
+    <div class="tableau"><table><tr><th>#</th><th>${t("c_pseudo")}</th><th class="n">${t("c_apportes")}</th><th class="n">${t("c_lus")}</th><th class="n">${t("c_scans")}</th><th class="n">${t("c_jours")}</th><th>${t("c_derniere")}</th></tr>${rang.map((e, i) =>
+      `<tr><td>${i + 1}</td><td class="c-pseudo">${nomP(e.p)}</td><td class="n">${nombre(e.app)}</td><td class="n">${nombre(e.lus)}</td><td class="n">${nombre(e.scans)}</td><td class="n">${e.jours.size}</td><td class="meta">${date(e.der)} · ${ilya(e.der)}</td></tr>`).join("")}</table></div>
+    <p class="petit" style="margin-top:10px">${t("c_aide")}</p>`;
+  // graphique : shops apportes par jour, empiles par joueur (tous les jours de la periode, meme vides)
+  const premier = Math.min(...liste.map(c => c[1]));
+  const jours = [];
+  const dernierJ = jour(Date.now() / 1000);
+  for (const d = new Date(Math.max(depuis, premier) * 1000); d.setHours(12, 0, 0, 0) && jour(d / 1000) <= dernierJ; d.setDate(d.getDate() + 1)) jours.push(jour(d / 1000));
+  const css = getComputedStyle(document.documentElement), c = n => n.startsWith("--") ? css.getPropertyValue(n).trim() : n;
+  if (graphContrib) graphContrib.destroy();
+  graphContrib = new Chart($("#c-graph"), { type: "bar",
+    data: { labels: jours.map(j => j.slice(8, 10) + "/" + j.slice(5, 7)), datasets: rang.map((e, i) => ({
+      label: e.p, data: jours.map(j => liste.filter(x => x[0] === e.p && jour(x[1]) === j).reduce((s, x) => s + x[4], 0)),
+      backgroundColor: c(COULEURS[i % COULEURS.length]), borderRadius: 3, maxBarThickness: 32 })) },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { title: { display: true, text: t("c_graph"), color: c("--doux"), align: "start" },
+        legend: { position: "bottom", labels: { color: c("--doux"), usePointStyle: true, boxWidth: 8 } },
+        tooltip: { filter: x => x.raw > 0 } },
+      scales: { x: { stacked: true, ticks: { color: c("--doux") }, grid: { display: false } },
+        y: { stacked: true, beginAtZero: true, ticks: { color: c("--doux"), precision: 0 }, grid: { color: c("--ligne") }, border: { display: false } } } } });
+}
+$("#b-contrib").onclick = () => { if (D) pageContrib(); };
+$("#b-retour-c").onclick = () => { montrer("market"); rechercher(); };
+
 // ---------- en-tete ----------
 function entete() {
   const enVente = ANN.filter(a => ACTUELS.has(a.obs.id)).length;
@@ -654,7 +718,8 @@ document.body.addEventListener("click", e => {
   const c = e.target.closest("[data-commune]"); if (c) { chargerRecherche(D.recherches_communes[+c.dataset.commune].s); return; }
   const s = e.target.closest("[data-sauvee]"); if (s) { chargerRecherche(sauvees()[+s.dataset.sauvee].s); return; }
   const x = e.target.closest("[data-suppr-sauvee]"); if (x) { const l = sauvees(); l.splice(+x.dataset.supprSauvee, 1); ecrireSauvees(l); afficherSauvees(); return; }
-  const m = e.target.closest("[data-mode]"); if (m) { S.mode = m.dataset.mode; document.querySelectorAll(".segment button").forEach(b => b.classList.toggle("actif", b === m)); rechercher(); return; }
+  const m = e.target.closest("[data-mode]"); if (m) { S.mode = m.dataset.mode; document.querySelectorAll("[data-mode]").forEach(b => b.classList.toggle("actif", b === m)); rechercher(); return; }
+  const pe = e.target.closest("[data-periode]"); if (pe) { periodeC = +pe.dataset.periode; try { localStorage.setItem("periode", periodeC); } catch (e) {} pageContrib(); return; }
 });
 ["#r-nom", "#r-raff", "#r-pmin", "#r-pmax"].forEach(s => $(s).addEventListener("input", rechercher));
 ["#r-slots", "#r-actuel", "#r-tri", "#r-sous"].forEach(s => $(s).addEventListener("change", () => { lireFormulaire(); remplirAffixes(); afficherFiltres(); rechercher(); }));
@@ -680,16 +745,19 @@ $("#theme").onclick = () => {
   const sombre = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   const th = sombre ? "light" : "dark"; appliquerTheme(th); try { localStorage.setItem("theme", th); } catch (e) {}
   if (objetCourant && $("#vue-objet").classList.contains("active")) ficheObjet(objetCourant);
+  if ($("#vue-contrib").classList.contains("active")) pageContrib();
 };
 function toutAfficher() {
   traduirePage(); if (!D) return;
   entete(); afficherSauvees(); ecrireFormulaire();
-  if ($("#vue-objet").classList.contains("active") && objetCourant) ficheObjet(objetCourant); else rechercher();
+  if ($("#vue-contrib").classList.contains("active")) pageContrib();
+  else if ($("#vue-objet").classList.contains("active") && objetCourant) ficheObjet(objetCourant); else rechercher();
 }
 $("#langue").onclick = () => { LANGUE = 1 - LANGUE; try { localStorage.setItem("langue", LANGUE ? "fr" : "en"); } catch (e) {} toutAfficher(); };
 function suivreLien() {
   const h = location.hash.slice(1);
   if (h.startsWith("objet=")) { ficheObjet(+h.slice(6)); return; }
+  if (h === "contrib") { pageContrib(); return; }
   if (h.startsWith("r=")) { const s = decoder(h.slice(2)); if (s) { S = s; ecrireFormulaire(); } }
   montrer("market"); rechercher();
 }

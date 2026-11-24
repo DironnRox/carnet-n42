@@ -339,10 +339,10 @@ const T = {
   g_min: ["Min price", "Prix minimum"], g_mediane: ["Median price", "Prix médian"], g_annonces: ["Listings seen", "Annonces vues"], g_ventes: ["Likely sales", "Ventes probables"],
   c_objet: ["Item", "Objet"], c_prix: ["Price", "Prix"], c_presence: ["Seen", "Présence"], c_statut: ["Status", "Statut"],
   contributeurs: ["👥 Contributors", "👥 Contributeurs"], p_7: ["7 days", "7 jours"], p_30: ["30 days", "30 jours"], p_tout: ["All time", "Depuis le début"],
-  c_scans: ["Scans sent", "Analyses envoyées"], c_lus: ["Shops read", "Shops lus"], c_apportes: ["Shops added to the site", "Shops apportés au site"],
+  c_scans: ["Scans sent", "Analyses envoyées"],
   c_actifs: ["Active contributors", "Contributeurs actifs"], c_pseudo: ["Player", "Joueur"], c_jours: ["Active days", "Jours actifs"],
-  c_derniere: ["Last scan", "Dernière analyse"], c_aide: ["“Added” = shop readings kept in the history. A shop re-read unchanged a few minutes after someone else is not counted. Names are the ones typed in ScanMarche.", "« Apportés » = lectures de shops retenues dans l'historique. Un shop relu sans changement quelques minutes après quelqu'un d'autre ne compte pas. Les pseudos sont ceux saisis dans ScanMarche."],
-  c_aucune: ["No scan over this period.", "Aucune analyse sur cette période."], c_graph: ["Shops added per day", "Shops apportés par jour"],
+  c_derniere: ["Last scan", "Dernière analyse"],
+  c_aucune: ["No scan over this period.", "Aucune analyse sur cette période."], c_graph: ["Scans per day", "Analyses par jour"],
   donnees_absentes: ["Data not found.", "Données introuvables."], chargement: ["Loading…", "Chargement…"],
 };
 const GROUPES = ["arme", "armure", "tete", "cape", "chaussures", "bouclier", "accessoire", "carte", "costume", "familier", "divers"];
@@ -655,6 +655,9 @@ function ficheObjet(id) {
 // ---------- contributeurs (D.contributions : [pseudo, debut, fin, shops lus, shops apportes] par analyse envoyee) ----------
 let periodeC = 30, graphContrib = null;
 try { const p = localStorage.getItem("periode"); if (p !== null && ["0", "7", "30"].includes(p)) periodeC = +p; } catch (e) {}
+// persos d'un meme joueur : comptes sous un seul nom
+const MEMES = { "dironn-bot": "Dironn", "xpace": "Dironn", "dironn": "Dironn" };
+const joueur = p => MEMES[String(p).toLowerCase()] || p;
 const COULEURS = ["--accent", "--bleu", "--vert", "#d9922b", "#9b6fd6", "#d0537a", "#3aa9a0", "#7d8590"];
 function pageContrib() {
   montrer("contrib"); history.replaceState(null, "", "#contrib");
@@ -663,19 +666,19 @@ function pageContrib() {
   const liste = (D.contributions || []).filter(c => c[1] >= depuis);
   if (!liste.length) { $("#c-contenu").innerHTML = `<div class="vide">${t("c_aucune")}</div>`; return; }
   const par = {};
-  for (const [p, debut, fin, lus, app] of liste) {
-    const e = par[p] ??= { p, scans: 0, lus: 0, app: 0, der: 0, jours: new Set() };
-    e.scans++; e.lus += lus; e.app += app; e.der = Math.max(e.der, fin); e.jours.add(jour(debut));
+  for (const [pseudo, debut, fin] of liste) {
+    const p = joueur(pseudo), e = par[p] ??= { p, scans: 0, der: 0, jours: new Set(), persos: new Set() };
+    e.scans++; e.der = Math.max(e.der, fin); e.jours.add(jour(debut)); e.persos.add(pseudo);
   }
-  const rang = Object.values(par).sort((a, b) => b.app - a.app || b.scans - a.scans);
+  const rang = Object.values(par).sort((a, b) => b.scans - a.scans || b.der - a.der);
   const somme = k => rang.reduce((s, e) => s + e[k], 0);
   const tuile = (l, v) => `<div class="tuile"><small>${t(l)}</small><b>${nombre(v)}</b></div>`;
-  const nomP = p => echap(p) + (/-bot$/i.test(p) ? " 🤖" : "");
-  $("#c-contenu").innerHTML = `<div class="tuiles">${tuile("c_actifs", rang.length)}${tuile("c_scans", somme("scans"))}${tuile("c_lus", somme("lus"))}${tuile("c_apportes", somme("app"))}</div>
+  const nomP = e => echap(e.p) + (e.persos.size > 1 || !e.persos.has(e.p) ? ` <span class="meta">(${[...e.persos].sort().map(echap).join(", ")})</span>` : "");
+  $("#c-contenu").innerHTML = `<div class="tuiles">${tuile("c_actifs", rang.length)}${tuile("c_scans", somme("scans"))}</div>
     <div class="graph"><canvas id="c-graph"></canvas></div>
-    <div class="tableau"><table><tr><th>#</th><th>${t("c_pseudo")}</th><th class="n">${t("c_apportes")}</th><th class="n">${t("c_lus")}</th><th class="n">${t("c_scans")}</th><th class="n">${t("c_jours")}</th><th>${t("c_derniere")}</th></tr>${rang.map((e, i) =>
-      `<tr><td>${i + 1}</td><td class="c-pseudo">${nomP(e.p)}</td><td class="n">${nombre(e.app)}</td><td class="n">${nombre(e.lus)}</td><td class="n">${nombre(e.scans)}</td><td class="n">${e.jours.size}</td><td class="meta">${date(e.der)} · ${ilya(e.der)}</td></tr>`).join("")}</table></div>
-    <p class="petit" style="margin-top:10px">${t("c_aide")}</p>`;
+    <div class="tableau"><table><tr><th>#</th><th>${t("c_pseudo")}</th><th class="n">${t("c_scans")}</th><th class="n">${t("c_jours")}</th><th>${t("c_derniere")}</th></tr>${rang.map((e, i) =>
+      `<tr><td>${i + 1}</td><td class="c-pseudo">${nomP(e)}</td><td class="n">${nombre(e.scans)}</td><td class="n">${e.jours.size}</td><td class="meta">${date(e.der)} · ${ilya(e.der)}</td></tr>`).join("")}</table></div>
+`;
   // graphique : shops apportes par jour, empiles par joueur (tous les jours de la periode, meme vides)
   const premier = Math.min(...liste.map(c => c[1]));
   const jours = [];
@@ -685,7 +688,7 @@ function pageContrib() {
   if (graphContrib) graphContrib.destroy();
   graphContrib = new Chart($("#c-graph"), { type: "bar",
     data: { labels: jours.map(j => j.slice(8, 10) + "/" + j.slice(5, 7)), datasets: rang.map((e, i) => ({
-      label: e.p, data: jours.map(j => liste.filter(x => x[0] === e.p && jour(x[1]) === j).reduce((s, x) => s + x[4], 0)),
+      label: e.p, data: jours.map(j => liste.filter(x => joueur(x[0]) === e.p && jour(x[1]) === j).length),
       backgroundColor: c(COULEURS[i % COULEURS.length]), borderRadius: 3, maxBarThickness: 32 })) },
     options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
       plugins: { title: { display: true, text: t("c_graph"), color: c("--doux"), align: "start" },

@@ -245,7 +245,10 @@ th .res { justify-content: flex-end; }
           </div>
           <label class="titre">Lien du groupe</label>
           <div class="lien-partage"><code id="r-lien"></code><button class="bouton petit" data-copier>Copier</button></div>
-          <button class="bouton danger petit" id="r-oublier">Oublier ce groupe sur cet appareil</button>
+          <button class="bouton discret petit" id="r-oublier">Oublier ce groupe sur cet appareil</button>
+          <label class="titre" for="r-suppr-nom" style="color:var(--rouge)">Supprimer le groupe</label>
+          <p class="meta">Définitif et pour tout le monde : membres, sessions et historique sont effacés. Tape le nom exact du groupe pour confirmer.</p>
+          <div class="ligne"><input id="r-suppr-nom" maxlength="60" autocomplete="off"><button class="bouton danger" id="r-suppr" disabled>Supprimer définitivement</button></div>
         </div>
       </div>
     </div>
@@ -552,6 +555,7 @@ function afficherReglages() {
       <button class="bouton ${m.actif ? "discret" : ""} petit" data-actif="${m.actif ? 0 : 1}">${m.actif ? "Désactiver" : "Réactiver"}</button>
     </div>`).join("");
   $("#r-nom").value = G.groupe.nom;
+  $("#r-suppr-nom").value = ""; $("#r-suppr-nom").placeholder = G.groupe.nom; $("#r-suppr").disabled = true;
   resEdit = G.groupe.ressources.map(r => ({ ...r }));
   afficherRessources();
 }
@@ -614,6 +618,16 @@ $("#r-nom-ok").onclick = async () => {
 $("#r-oublier").onclick = () => {
   ecrire("partage_groupes", lire("partage_groupes", []).filter(g => g.code !== code));
   location.hash = ""; toast("Groupe retiré de cet appareil (le lien reste valable)");
+};
+$("#r-suppr-nom").oninput = () => { $("#r-suppr").disabled = $("#r-suppr-nom").value.trim() !== G.groupe.nom; };
+$("#r-suppr").onclick = async () => {
+  const b = $("#r-suppr"); b.disabled = true;
+  try {
+    await rpc("partage_supprimer_groupe", { p_code: code, p_nom_confirme: $("#r-suppr-nom").value.trim() });
+    ecrire("partage_groupes", lire("partage_groupes", []).filter(g => g.code !== code));
+    const nom = G.groupe.nom; code = null; G = null;
+    location.hash = ""; toast("Groupe « " + nom + " » supprimé");
+  } catch (err) { toast(err.message, true); b.disabled = false; }
 };
 document.addEventListener("click", async e => {
   if (!e.target.matches("[data-copier]")) return;

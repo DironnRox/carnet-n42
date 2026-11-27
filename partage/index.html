@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Partage Mémorial</title>
+<link rel="icon" type="image/png" href="../icones/25424.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fond: #f4f2ee; --surface: #ffffff; --surface-2: #faf9f6; --texte: #1c1b19; --doux: #6e6a63; --tres-doux: #a19c93;
+  --ligne: #e6e2da; --accent: #c2622d; --accent-fond: #fbeee5; --vert: #2d7a4f; --vert-fond: #e5f3ea;
+  --rouge: #b03a3a; --rouge-fond: #f8e6e6; --bleu: #2c5b96; --bleu-fond: #e6eef8; --or: #a57a12; --or-fond: #f7efd9;
+  --ombre: 0 1px 2px rgba(30, 25, 15, .05), 0 4px 16px rgba(30, 25, 15, .05); --rayon: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fond: #121214; --surface: #1b1b1f; --surface-2: #222227; --texte: #ecebe8; --doux: #a3a19b; --tres-doux: #6f6d68;
+    --ligne: #2e2e34; --accent: #e88a55; --accent-fond: #3a2519; --vert: #6cc48f; --vert-fond: #1c3326;
+    --rouge: #e47b7b; --rouge-fond: #3b2020; --bleu: #84aee6; --bleu-fond: #1d2a3d; --or: #e0b54d; --or-fond: #352b14;
+    --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+  }
+}
+:root[data-theme="dark"] {
+  --fond: #121214; --surface: #1b1b1f; --surface-2: #222227; --texte: #ecebe8; --doux: #a3a19b; --tres-doux: #6f6d68;
+  --ligne: #2e2e34; --accent: #e88a55; --accent-fond: #3a2519; --vert: #6cc48f; --vert-fond: #1c3326;
+  --rouge: #e47b7b; --rouge-fond: #3b2020; --bleu: #84aee6; --bleu-fond: #1d2a3d; --or: #e0b54d; --or-fond: #352b14;
+  --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--fond); color: var(--texte); }
+body { font: 14.5px/1.5 Inter, system-ui, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; }
+.page { max-width: 1100px; margin: 0 auto; padding: 0 16px 80px; }
+header { padding: 28px 0 18px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+.marque h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+.marque h1 span { color: var(--accent); }
+.marque p { margin: 4px 0 0; color: var(--doux); font-size: 13.5px; }
+.outils { display: flex; gap: 8px; flex-wrap: wrap; }
+.theme { border: 1px solid var(--ligne); background: var(--surface); border-radius: 9px; padding: 7px 10px; cursor: pointer; color: var(--doux); text-decoration: none; font-size: 14px; }
+.theme:hover { color: var(--texte); }
+nav { display: inline-flex; gap: 2px; background: var(--surface); border: 1px solid var(--ligne); border-radius: 11px; padding: 3px; box-shadow: var(--ombre); margin-bottom: 18px; max-width: 100%; overflow-x: auto; }
+nav button { border: 0; background: none; padding: 8px 16px; border-radius: 8px; color: var(--doux); font-weight: 500; cursor: pointer; white-space: nowrap; }
+nav button:hover { color: var(--texte); }
+nav button.actif { background: var(--accent); color: #fff; }
+.vue, .panneau { display: none; } .vue.active, .panneau.actif { display: block; }
+input, select, textarea { font: inherit; color: var(--texte); background: var(--surface); border: 1px solid var(--ligne); border-radius: 9px; padding: 9px 12px; min-width: 0; outline: none; transition: border-color .15s; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; width: 100%; }
+input[type=number] { width: 84px; font-variant-numeric: tabular-nums; }
+.bouton { border: 0; background: var(--accent); color: #fff; border-radius: 9px; padding: 9px 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.bouton:disabled { opacity: .5; cursor: default; }
+.bouton.discret { background: var(--surface-2); color: var(--texte); border: 1px solid var(--ligne); }
+.bouton.danger { background: var(--rouge-fond); color: var(--rouge); }
+.bouton.petit { padding: 5px 10px; font-size: 13px; }
+.carte { background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 18px; margin-bottom: 14px; }
+.carte h2 { margin: 0 0 4px; font-size: 17px; }
+.carte > p.meta:first-of-type { margin-top: 0; }
+.meta { color: var(--doux); font-size: 12.5px; }
+.grille2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; align-items: start; }
+label.titre { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); margin: 12px 0 6px; }
+.ligne { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ligne > input:not([type=number]):not([type=date]) { flex: 1; min-width: 160px; }
+.stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat { background: var(--surface); border: 1px solid var(--ligne); border-radius: 10px; padding: 8px 14px; box-shadow: var(--ombre); }
+.stat b { display: block; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat small { color: var(--doux); font-size: 12px; }
+.tete-groupe { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.tete-groupe h2 { margin: 0; font-size: 22px; letter-spacing: -.01em; }
+.defile { overflow-x: auto; border-radius: var(--rayon); box-shadow: var(--ombre); }
+table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--ligne); border-radius: var(--rayon); overflow: hidden; }
+th, td { padding: 9px 12px; border-bottom: 1px solid var(--ligne); text-align: left; vertical-align: middle; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--doux); font-weight: 600; background: var(--surface-2); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td { background: var(--surface-2); font-weight: 600; }
+tr.inactif td { color: var(--tres-doux); }
+tr.prochain td { background: var(--surface-2); font-size: 12.5px; color: var(--doux); }
+.ico { width: 24px; height: 24px; image-rendering: pixelated; vertical-align: middle; flex: none; }
+.res { display: inline-flex; align-items: center; gap: 6px; }
+th .res { justify-content: flex-end; }
+.puce { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
+.p-surplus { background: var(--or-fond); color: var(--or); }
+.p-annulee { background: var(--rouge-fond); color: var(--rouge); }
+.p-doux { background: var(--surface-2); color: var(--doux); border: 1px solid var(--ligne); }
+.plus { color: var(--or); font-weight: 700; font-size: 12px; margin-left: 3px; }
+.presents { display: flex; flex-wrap: wrap; gap: 6px; }
+.presents button { border: 1px solid var(--ligne); background: var(--surface-2); color: var(--doux); border-radius: 999px; padding: 6px 12px; cursor: pointer; font-weight: 500; }
+.presents button.oui { background: var(--accent-fond); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.quantites { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 8px; }
+.quantite { display: flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--ligne); border-radius: 10px; padding: 6px 8px; }
+.quantite span { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+.quantite input { width: 58px; padding: 6px 6px; text-align: right; flex: none; }
+.vide { color: var(--doux); text-align: center; padding: 40px 20px; background: var(--surface); border: 1px dashed var(--ligne); border-radius: var(--rayon); }
+.erreur { color: var(--rouge); font-size: 13px; min-height: 1.2em; margin: 8px 0 0; }
+.session { padding: 14px 16px; }
+.session.annulee > *:not(.session-tete) { opacity: .5; }
+.session-tete { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.session-tete b { font-size: 15px; }
+.lots { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 10px; }
+.liste-groupes { display: grid; gap: 8px; }
+.liste-groupes a { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--ligne); border-radius: 10px; background: var(--surface-2); color: inherit; text-decoration: none; font-weight: 600; }
+.liste-groupes a:hover { border-color: var(--accent); color: var(--accent); }
+.membre { display: flex; gap: 6px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--ligne); flex-wrap: wrap; }
+.membre:last-child { border-bottom: 0; }
+.membre input[type=text] { flex: 1; min-width: 120px; padding: 6px 10px; }
+.fleche { border: 1px solid var(--ligne); background: var(--surface-2); border-radius: 7px; width: 30px; height: 30px; cursor: pointer; color: var(--doux); }
+.fleche:disabled { opacity: .35; cursor: default; }
+.lien-partage { display: flex; gap: 8px; align-items: center; background: var(--accent-fond); border-radius: 10px; padding: 10px 12px; margin: 10px 0; flex-wrap: wrap; }
+.lien-partage code { flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; font-size: 12.5px; }
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--texte); color: var(--fond); padding: 10px 16px; border-radius: 10px; font-weight: 500; opacity: 0; pointer-events: none; transition: .2s; z-index: 20; max-width: calc(100% - 32px); }
+#toast.vu { opacity: 1; transform: translateX(-50%); }
+#toast.mal { background: var(--rouge); color: #fff; }
+.explication { font-size: 13px; color: var(--doux); }
+.explication summary { cursor: pointer; font-weight: 600; color: var(--texte); }
+@media (max-width: 600px) {
+  .marque h1 { font-size: 22px; }
+  th, td { padding: 8px 9px; }
+  .carte { padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="marque">
+      <h1>Partage <span>Mémorial</span></h1>
+      <p>Répartition équitable des ressources de session en session</p>
+    </div>
+    <div class="outils">
+      <a class="theme" href="#" id="b-accueil" title="Mes groupes">⌂ Groupes</a>
+      <a class="theme" href="../">Market ↗</a>
+      <button class="theme" id="b-theme">◐ Thème</button>
+    </div>
+  </header>
+
+  <!-- ================= ACCUEIL ================= -->
+  <section class="vue" id="v-accueil">
+    <div class="grille2">
+      <div class="carte">
+        <h2>Mes groupes</h2>
+        <p class="meta">Les groupes ouverts sur cet appareil. Pour en rejoindre un, ouvre le lien qu'on t'a partagé.</p>
+        <div class="liste-groupes" id="mes-groupes"></div>
+      </div>
+      <form class="carte" id="f-creer" autocomplete="off">
+        <h2>Créer un groupe</h2>
+        <p class="meta">Tu obtiendras un lien secret à partager : toute personne qui l'a peut voir et saisir.</p>
+        <label class="titre" for="c-nom">Nom du groupe</label>
+        <input id="c-nom" maxlength="60" required placeholder="ex. Mémo du mardi" style="width:100%">
+        <label class="titre" for="c-membres">Membres (un par ligne, dans l'ordre de rotation)</label>
+        <textarea id="c-membres" rows="5" required placeholder="Dironn&#10;Aoki&#10;Lordbob"></textarea>
+        <label class="titre">Ressources partagées</label>
+        <div class="presents" id="c-ressources"></div>
+        <p class="erreur" id="c-err"></p>
+        <button class="bouton" type="submit">Créer le groupe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= GROUPE ================= -->
+  <section class="vue" id="v-groupe">
+    <div class="tete-groupe">
+      <h2 id="g-nom"></h2>
+      <div class="stats" id="g-stats"></div>
+    </div>
+    <div class="lien-partage" id="g-nouveau" hidden>
+      <span>🎉 Groupe créé ! Envoie ce lien aux membres :</span>
+      <code id="g-lien-nouveau"></code>
+      <button class="bouton petit" data-copier>Copier</button>
+    </div>
+    <nav id="onglets">
+      <button data-p="tableau" class="actif">Tableau</button>
+      <button data-p="saisie">+ Nouvelle session</button>
+      <button data-p="historique">Historique</button>
+      <button data-p="reglages">Réglages</button>
+    </nav>
+
+    <div class="panneau actif" id="p-tableau">
+      <div class="defile"><table id="t-cumuls"></table></div>
+      <details class="explication carte" style="margin-top:14px">
+        <summary>Comment c'est réparti ?</summary>
+        <p>Pour chaque ressource, chaque personne présente reçoit sa part entière (quantité ÷ nombre de présents).
+        Le reste va à ceux qui ont <b>le moins profité des restes jusqu'ici</b> ; à égalité, on suit l'ordre du groupe.
+        Avec toujours les mêmes présents, ça tourne 1 → 2 → 3 → 1… Une absence ne compte ni pour ni contre :
+        on n'est comparé que sur les sessions où on était là. La ligne « Prochain reste » indique qui le recevra
+        si tout le monde est présent.</p>
+      </details>
+    </div>
+
+    <div class="panneau" id="p-saisie">
+      <div class="grille2">
+        <div class="carte">
+          <h2>Session</h2>
+          <label class="titre">Présents</label>
+          <div class="presents" id="s-presents"></div>
+          <label class="titre">Ressources obtenues (total du groupe)</label>
+          <div class="quantites" id="s-quantites"></div>
+          <div class="ligne" style="margin-top:4px">
+            <div style="flex:1;min-width:140px"><label class="titre" for="s-par">Saisi par</label><input id="s-par" maxlength="40" style="width:100%" placeholder="ton pseudo"></div>
+            <div><label class="titre" for="s-date">Date</label><input id="s-date" type="date"></div>
+          </div>
+          <label class="titre" for="s-note">Note (facultatif)</label>
+          <input id="s-note" maxlength="200" style="width:100%" placeholder="ex. Orc HARD x3">
+        </div>
+        <div class="carte">
+          <h2>Répartition</h2>
+          <p class="meta" id="s-apercu-info">Saisis les quantités pour voir qui reçoit quoi.</p>
+          <div class="defile" id="s-apercu"></div>
+          <p class="erreur" id="s-err"></p>
+          <button class="bouton" id="s-valider" disabled>Valider la session</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panneau" id="p-historique">
+      <div id="h-liste"></div>
+      <div style="text-align:center"><button class="bouton discret" id="h-plus" hidden>Afficher plus</button></div>
+    </div>
+
+    <div class="panneau" id="p-reglages">
+      <div class="grille2">
+        <div class="carte">
+          <h2>Membres</h2>
+          <p class="meta">L'ordre sert à départager les égalités. Un membre désactivé garde son historique mais n'est plus proposé.</p>
+          <div id="r-membres"></div>
+          <form class="ligne" id="f-membre" style="margin-top:10px" autocomplete="off">
+            <input id="r-nouveau" maxlength="40" placeholder="Nouveau membre" required>
+            <button class="bouton" type="submit">Ajouter</button>
+          </form>
+        </div>
+        <div class="carte">
+          <h2>Groupe</h2>
+          <label class="titre" for="r-nom">Nom</label>
+          <div class="ligne"><input id="r-nom" maxlength="60"><button class="bouton discret" id="r-nom-ok">Renommer</button></div>
+          <label class="titre">Ressources</label>
+          <p class="meta">Retirer une ressource la masque de la saisie ; l'historique est conservé. Icône = numéro d'objet RO (facultatif).</p>
+          <div id="r-ressources"></div>
+          <div class="ligne" style="margin-top:8px">
+            <button class="bouton discret petit" id="r-res-ajout">+ Ressource</button>
+            <button class="bouton petit" id="r-res-ok">Enregistrer les ressources</button>
+          </div>
+          <label class="titre">Lien du groupe</label>
+          <div class="lien-partage"><code id="r-lien"></code><button class="bouton petit" data-copier>Copier</button></div>
+          <button class="bouton danger petit" id="r-oublier">Oublier ce groupe sur cet appareil</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vue" id="v-erreur"><div class="vide" id="e-texte"></div></section>
+</div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+const CONFIG = { url: "https://qwgmkjpblksugkessfpg.supabase.co", cle: "sb_publishable_7s-TvFcSX53ImVZYTRmXnA_1helkURD" };
+const RESSOURCES_DISPO = [
+  { cle: "fragment", nom: "Fragment", icone: 25424 },
+  { cle: "mithril", nom: "Mithril", icone: 25429 },
+  { cle: "opale", nom: "Opale", icone: 25458 },
+  { cle: "emeraude", nom: "Émeraude", icone: 25457 },
+  { cle: "rubis", nom: "Rubis", icone: 25460 },
+  { cle: "saphir", nom: "Saphir", icone: 25459 },
+];
+const PAR_DEFAUT = ["fragment", "mithril", "opale", "emeraude", "rubis"];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const lire = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } };
+const ecrire = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+// ---------- thème (partagé avec le market : même clé « theme ») ----------
+function appliquerTheme(th) { if (th) document.documentElement.dataset.theme = th; else delete document.documentElement.dataset.theme; }
+try { appliquerTheme(localStorage.getItem("theme")); } catch (e) {}
+$("#b-theme").onclick = () => {
+  const sombre = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const th = sombre ? "light" : "dark"; appliquerTheme(th); try { localStorage.setItem("theme", th); } catch (e) {}
+};
+
+let toastT;
+function toast(msg, mal) {
+  const t = $("#toast"); t.textContent = msg; t.className = "vu" + (mal ? " mal" : "");
+  clearTimeout(toastT); toastT = setTimeout(() => t.className = "", mal ? 5000 : 2500);
+}
+
+// ---------- API ----------
+async function rpc(fn, params) {
+  const rep = await fetch(`${CONFIG.url}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers: { apikey: CONFIG.cle, Authorization: `Bearer ${CONFIG.cle}`, "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  const txt = await rep.text();
+  if (!rep.ok) { let m = txt; try { m = JSON.parse(txt).message || txt; } catch (e) {} throw new Error(m); }
+  return txt ? JSON.parse(txt) : null;
+}
+
+// ---------- état ----------
+let code = null, G = null, sessions = [], plusDispo = false;
+const LIMITE = 50;
+const membreParId = () => Object.fromEntries((G?.membres || []).map(m => [m.id, m]));
+const lienGroupe = c => location.href.split("#")[0] + "#g=" + c;
+const icone = r => r && r.icone ? `<img class="ico" src="../icones/${Number(r.icone)}.png" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : "";
+const resParCle = () => Object.fromEntries((G?.groupe.ressources || []).map(r => [r.cle, r]));
+// nom affiché d'une ressource, y compris retirée du groupe depuis
+const nomRes = cle => resParCle()[cle] || RESSOURCES_DISPO.find(r => r.cle === cle) || { cle, nom: cle };
+
+function memoriserGroupe() {
+  const l = lire("partage_groupes", []).filter(g => g.code !== code);
+  l.unshift({ code, nom: G.groupe.nom, vu: Date.now() });
+  ecrire("partage_groupes", l.slice(0, 30));
+}
+
+function montrer(vue) { document.querySelectorAll(".vue").forEach(v => v.classList.toggle("active", v.id === "v-" + vue)); }
+function onglet(p) {
+  document.querySelectorAll("#onglets button").forEach(b => b.classList.toggle("actif", b.dataset.p === p));
+  document.querySelectorAll(".panneau").forEach(x => x.classList.toggle("actif", x.id === "p-" + p));
+  if (p === "saisie") apercu();
+}
+$("#onglets").onclick = e => { const b = e.target.closest("button"); if (b) onglet(b.dataset.p); };
+
+// ---------- routage : #g=CODE ----------
+async function route() {
+  const m = location.hash.match(/g=([A-Za-z0-9]+)/);
+  if (!m) { code = null; G = null; document.title = "Partage Mémorial"; afficherAccueil(); return; }
+  if (m[1] !== code) { code = m[1]; G = null; onglet("tableau"); }
+  try { await charger(); montrer("groupe"); }
+  catch (e) {
+    $("#e-texte").innerHTML = `<b>Impossible d'ouvrir ce groupe.</b><br>${esc(e.message)}<br><br><a href="#">Retour à mes groupes</a>`;
+    montrer("erreur");
+  }
+}
+window.addEventListener("hashchange", route);
+$("#b-accueil").onclick = e => { e.preventDefault(); location.hash = ""; };
+
+async function charger() {
+  G = await rpc("partage_lire_groupe", { p_code: code, p_limite: LIMITE });
+  sessions = G.sessions; plusDispo = sessions.length === LIMITE;
+  memoriserGroupe();
+  document.title = G.groupe.nom + " · Partage Mémorial";
+  afficherGroupe();
+}
+
+// ---------- accueil ----------
+function afficherAccueil() {
+  const l = lire("partage_groupes", []);
+  $("#mes-groupes").innerHTML = l.length
+    ? l.map(g => `<a href="#g=${esc(g.code)}"><span>${esc(g.nom)}</span><span class="meta">ouvrir →</span></a>`).join("")
+    : `<p class="meta">Aucun groupe pour l'instant.</p>`;
+  $("#c-ressources").innerHTML = RESSOURCES_DISPO.map(r =>
+    `<button type="button" data-cle="${r.cle}" class="${PAR_DEFAUT.includes(r.cle) ? "oui" : ""}">${icone(r)} ${esc(r.nom)}</button>`).join("");
+  montrer("accueil");
+}
+$("#c-ressources").onclick = e => { const b = e.target.closest("button"); if (b) b.classList.toggle("oui"); };
+$("#f-creer").onsubmit = async e => {
+  e.preventDefault();
+  const membres = $("#c-membres").value.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+  const cles = [...document.querySelectorAll("#c-ressources button.oui")].map(b => b.dataset.cle);
+  $("#c-err").textContent = "";
+  if (!cles.length) { $("#c-err").textContent = "Choisis au moins une ressource."; return; }
+  try {
+    const r = await rpc("partage_creer_groupe", {
+      p_nom: $("#c-nom").value.trim(), p_membres: membres,
+      p_ressources: RESSOURCES_DISPO.filter(x => cles.includes(x.cle)),
+    });
+    $("#f-creer").reset();
+    location.hash = "g=" + r.code;
+    $("#g-lien-nouveau").textContent = lienGroupe(r.code); $("#g-nouveau").hidden = false;
+  } catch (err) { $("#c-err").textContent = err.message; }
+};
+
+// ---------- groupe ----------
+function afficherGroupe() {
+  $("#g-nom").textContent = G.groupe.nom;
+  const actifs = G.membres.filter(m => m.actif).length;
+  $("#g-stats").innerHTML = `<div class="stat"><b>${G.nb_sessions}</b><small>sessions</small></div>
+    <div class="stat"><b>${actifs}</b><small>membres actifs</small></div>`;
+  $("#r-lien").textContent = lienGroupe(code);
+  if (!$("#g-lien-nouveau").textContent.includes(code)) $("#g-nouveau").hidden = true;
+  afficherTableau(); afficherSaisie(); afficherHistorique(); afficherReglages();
+}
+
+// Ressources à afficher : celles du groupe + celles retirées mais présentes dans l'historique
+function colonnes() {
+  const cles = G.groupe.ressources.map(r => r.cle);
+  for (const m of G.membres) for (const c of Object.keys(m.totaux)) if (!cles.includes(c)) cles.push(c);
+  return cles.map(nomRes);
+}
+
+function afficherTableau() {
+  const cols = colonnes();
+  if (!G.membres.length) { $("#t-cumuls").innerHTML = ""; return; }
+  const membres = [...G.membres].sort((a, b) => (b.actif - a.actif) || (a.ordre - b.ordre));
+  const total = c => G.membres.reduce((s, m) => s + (m.totaux[c] || 0), 0);
+  // prochain reste : membre actif au plus petit solde, égalité = ordre
+  const prochain = c => [...G.membres].filter(m => m.actif)
+    .sort((a, b) => (Math.round(((a.soldes[c] || 0) - (b.soldes[c] || 0)) * 1e6)) || (a.ordre - b.ordre) || (a.id - b.id))[0];
+  $("#t-cumuls").innerHTML = `
+    <thead><tr><th>Membre</th><th class="n">Sessions</th>${cols.map(r => `<th class="n"><span class="res">${icone(r)}${esc(r.nom)}</span></th>`).join("")}</tr></thead>
+    <tbody>${membres.map(m => `<tr class="${m.actif ? "" : "inactif"}"><td><b>${esc(m.nom)}</b>${m.actif ? "" : ' <span class="puce p-doux">inactif</span>'}</td>
+      <td class="n">${m.sessions}</td>${cols.map(r => `<td class="n">${m.totaux[r.cle] || 0}</td>`).join("")}</tr>`).join("")}
+    <tr class="total"><td>Total</td><td class="n">${G.nb_sessions}</td>${cols.map(r => `<td class="n">${total(r.cle)}</td>`).join("")}</tr>
+    <tr class="prochain"><td>Prochain reste →</td><td></td>${cols.map(r => `<td class="n">${G.groupe.ressources.some(x => x.cle === r.cle) ? esc(prochain(r.cle)?.nom || "") : ""}</td>`).join("")}</tr>
+    </tbody>`;
+}
+
+// ---------- saisie ----------
+let presents = new Set();
+function afficherSaisie() {
+  const actifs = G.membres.filter(m => m.actif);
+  // garde la sélection en cours si on recharge ; sinon tout le monde
+  const ids = new Set(actifs.map(m => m.id));
+  presents = new Set([...presents].filter(i => ids.has(i)));
+  if (!presents.size) presents = new Set(ids);
+  $("#s-presents").innerHTML = actifs.map(m => `<button type="button" data-id="${m.id}" class="${presents.has(m.id) ? "oui" : ""}">${esc(m.nom)}</button>`).join("")
+    || `<p class="meta">Aucun membre actif.</p>`;
+  const anciens = Object.fromEntries([...document.querySelectorAll("#s-quantites input")].map(i => [i.dataset.cle, i.value]));
+  $("#s-quantites").innerHTML = G.groupe.ressources.map(r => `<label class="quantite">${icone(r)}<span>${esc(r.nom)}</span>
+    <input type="number" min="0" max="100000" step="1" inputmode="numeric" data-cle="${esc(r.cle)}" value="${esc(anciens[r.cle] || "")}" placeholder="0"></label>`).join("");
+  if (!$("#s-par").value) $("#s-par").value = lire("partage_pseudo", "");
+  if (!$("#s-date").value) $("#s-date").value = new Date().toLocaleDateString("en-CA");
+}
+$("#s-presents").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const id = Number(b.dataset.id);
+  presents.has(id) ? presents.delete(id) : presents.add(id);
+  b.classList.toggle("oui", presents.has(id)); apercu();
+};
+$("#s-quantites").oninput = () => apercu();
+
+function lotsSaisis() {
+  const lots = {};
+  for (const i of document.querySelectorAll("#s-quantites input")) {
+    const v = i.value.trim(); if (v === "") continue;
+    const n = Number(v);
+    if (!Number.isInteger(n) || n < 0) throw new Error("Quantité invalide : " + v);
+    if (n > 0) lots[i.dataset.cle] = n;
+  }
+  return lots;
+}
+
+let apercuT, apercuNum = 0, dernierApercu = null;
+function apercu() {
+  clearTimeout(apercuT);
+  $("#s-valider").disabled = true; dernierApercu = null;
+  apercuT = setTimeout(async () => {
+    const num = ++apercuNum;
+    $("#s-err").textContent = "";
+    let lots;
+    try { lots = lotsSaisis(); } catch (e) { $("#s-err").textContent = e.message; $("#s-apercu").innerHTML = ""; return; }
+    if (!Object.keys(lots).length || !presents.size) {
+      $("#s-apercu").innerHTML = "";
+      $("#s-apercu-info").textContent = !presents.size ? "Coche au moins une personne présente." : "Saisis les quantités pour voir qui reçoit quoi.";
+      return;
+    }
+    try {
+      const r = await rpc("partage_repartir", { p_code: code, p_presents: [...presents], p_lots: lots, p_valider: false });
+      if (num !== apercuNum) return;  // une saisie plus récente est en cours
+      dernierApercu = { lots, presents: [...presents] };
+      $("#s-apercu-info").textContent = `${presents.size} présent${presents.size > 1 ? "s" : ""} · ★ = reçoit un reste ce coup-ci`;
+      $("#s-apercu").innerHTML = tableAttributions(r.attributions.map(a => [a.membre, a.ressource, a.quantite, a.surplus]), Object.keys(lots), [...presents]);
+      $("#s-valider").disabled = false;
+    } catch (e) { if (num === apercuNum) { $("#s-err").textContent = e.message; $("#s-apercu").innerHTML = ""; } }
+  }, 250);
+}
+
+// attributions = [[membre, ressource, quantite, surplus], ...]
+function tableAttributions(attributions, cles, ordreMembres) {
+  const mp = membreParId(), par = {};
+  for (const [m, c, q, s] of attributions) (par[m] ??= {})[c] = { q, s };
+  const ids = (ordreMembres || Object.keys(par).map(Number)).slice()
+    .sort((a, b) => ((mp[a]?.ordre ?? 1e9) - (mp[b]?.ordre ?? 1e9)) || a - b);
+  const cols = cles.map(nomRes);
+  return `<table><thead><tr><th>Membre</th>${cols.map(r => `<th class="n"><span class="res">${icone(r)}${esc(r.nom)}</span></th>`).join("")}</tr></thead><tbody>
+    ${ids.map(id => `<tr><td>${esc(mp[id]?.nom ?? "?")}</td>${cols.map(r => {
+      const x = par[id]?.[r.cle]; return `<td class="n">${x ? x.q + (x.s ? '<span class="plus" title="reçoit un reste">★</span>' : "") : "–"}</td>`;
+    }).join("")}</tr>`).join("")}</tbody></table>`;
+}
+
+$("#s-valider").onclick = async () => {
+  if (!dernierApercu) return;
+  const b = $("#s-valider"); b.disabled = true;
+  const par = $("#s-par").value.trim(); ecrire("partage_pseudo", par);
+  try {
+    await rpc("partage_repartir", {
+      p_code: code, p_presents: dernierApercu.presents, p_lots: dernierApercu.lots,
+      p_saisi_par: par, p_note: $("#s-note").value.trim(), p_joue_le: $("#s-date").value || null, p_valider: true,
+    });
+    document.querySelectorAll("#s-quantites input").forEach(i => i.value = "");
+    $("#s-note").value = ""; $("#s-apercu").innerHTML = ""; presents = new Set();
+    await charger(); onglet("tableau"); toast("Session enregistrée ✔");
+  } catch (e) { $("#s-err").textContent = e.message; b.disabled = false; }
+};
+
+// ---------- historique ----------
+const fmtDate = d => new Date(d + "T12:00:00").toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+const fmtHeure = t => new Date(t).toLocaleString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+function afficherHistorique() {
+  const mp = membreParId();
+  $("#h-liste").innerHTML = sessions.length ? sessions.map(s => {
+    const rang = c => { const i = colonnes().findIndex(r => r.cle === c); return i < 0 ? 99 : i; };
+    const cles = Object.keys(s.lots || {}).sort((x, y) => rang(x) - rang(y));
+    const absents = G.membres.filter(m => m.actif && !(s.presents || []).includes(m.id)).map(m => m.nom);
+    return `<div class="carte session ${s.annulee ? "annulee" : ""}">
+      <div class="session-tete">
+        <div><b>${esc(fmtDate(s.joue_le))}</b> ${s.note ? `· ${esc(s.note)}` : ""}
+          ${s.annulee ? `<span class="puce p-annulee">annulée${s.annulee_par ? " par " + esc(s.annulee_par) : ""}</span>` : ""}
+          <div class="meta">saisie ${s.saisi_par ? "par " + esc(s.saisi_par) + " " : ""}le ${esc(fmtHeure(s.cree_le))}${absents.length ? " · absents : " + esc(absents.join(", ")) : ""}</div></div>
+        <button class="bouton ${s.annulee ? "discret" : "danger"} petit" data-annuler="${s.id}" data-etat="${s.annulee ? 0 : 1}">${s.annulee ? "Restaurer" : "Annuler"}</button>
+      </div>
+      <div class="lots">${cles.map(c => `<span class="res">${icone(nomRes(c))}<b>${s.lots[c]}</b> ${esc(nomRes(c).nom)}</span>`).join("")}</div>
+      <div class="defile">${tableAttributions(s.attributions || [], cles, s.presents)}</div>
+    </div>`;
+  }).join("") : `<div class="vide">Aucune session pour l'instant. Utilise « + Nouvelle session » après ton mémorial.</div>`;
+  $("#h-plus").hidden = !plusDispo;
+}
+let confirmer = null;
+$("#h-liste").onclick = async e => {
+  const b = e.target.closest("[data-annuler]"); if (!b) return;
+  const id = Number(b.dataset.annuler), annuler = b.dataset.etat === "1";
+  if (confirmer !== id) {  // 1er clic : demande confirmation
+    confirmer = id; b.textContent = annuler ? "Confirmer l'annulation ?" : "Confirmer la restauration ?";
+    setTimeout(() => { if (confirmer === id) { confirmer = null; afficherHistorique(); } }, 4000);
+    return;
+  }
+  confirmer = null; b.disabled = true;
+  try {
+    await rpc("partage_annuler_session", { p_code: code, p_session: id, p_annuler: annuler, p_par: lire("partage_pseudo", "") });
+    await charger(); toast(annuler ? "Session annulée : retirée des cumuls" : "Session restaurée");
+  } catch (err) { toast(err.message, true); b.disabled = false; }
+};
+$("#h-plus").onclick = async () => {
+  try {
+    const r = await rpc("partage_lire_groupe", { p_code: code, p_limite: LIMITE, p_avant: sessions[sessions.length - 1].id });
+    sessions = sessions.concat(r.sessions); plusDispo = r.sessions.length === LIMITE; afficherHistorique();
+  } catch (e) { toast(e.message, true); }
+};
+
+// ---------- réglages ----------
+let resEdit = [];
+function afficherReglages() {
+  const ms = G.membres;
+  $("#r-membres").innerHTML = ms.map((m, i) => `<div class="membre" data-id="${m.id}">
+      <button class="fleche" data-bouger="-1" ${i === 0 ? "disabled" : ""} title="Monter">↑</button>
+      <button class="fleche" data-bouger="1" ${i === ms.length - 1 ? "disabled" : ""} title="Descendre">↓</button>
+      <input type="text" value="${esc(m.nom)}" maxlength="40" data-nom>
+      <button class="bouton discret petit" data-renommer>Renommer</button>
+      <button class="bouton ${m.actif ? "discret" : ""} petit" data-actif="${m.actif ? 0 : 1}">${m.actif ? "Désactiver" : "Réactiver"}</button>
+    </div>`).join("");
+  $("#r-nom").value = G.groupe.nom;
+  resEdit = G.groupe.ressources.map(r => ({ ...r }));
+  afficherRessources();
+}
+function afficherRessources() {
+  $("#r-ressources").innerHTML = resEdit.map((r, i) => `<div class="membre" data-i="${i}">
+      ${icone(r) || '<span class="ico"></span>'}
+      <input type="text" value="${esc(r.nom)}" maxlength="40" data-res-nom>
+      <input type="number" value="${r.icone ?? ""}" placeholder="icône" min="1" data-res-ico style="width:96px">
+      <button class="fleche" data-res-suppr title="Retirer">✕</button>
+    </div>`).join("");
+}
+const cleDe = nom => nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "").slice(0, 30) || "res";
+$("#r-ressources").oninput = e => {
+  const l = e.target.closest("[data-i]"); if (!l) return;
+  const r = resEdit[Number(l.dataset.i)];
+  if (e.target.matches("[data-res-nom]")) r.nom = e.target.value;
+  if (e.target.matches("[data-res-ico]")) r.icone = e.target.value ? Number(e.target.value) : null;
+};
+$("#r-ressources").onclick = e => {
+  if (!e.target.closest("[data-res-suppr]")) return;
+  resEdit.splice(Number(e.target.closest("[data-i]").dataset.i), 1); afficherRessources();
+};
+$("#r-res-ajout").onclick = () => { resEdit.push({ cle: null, nom: "", icone: null }); afficherRessources(); $("#r-ressources [data-i]:last-child input").focus(); };
+$("#r-res-ok").onclick = async () => {
+  const pris = new Set(resEdit.filter(r => r.cle).map(r => r.cle));
+  const liste = resEdit.filter(r => r.nom.trim()).map(r => {
+    if (r.cle) return { cle: r.cle, nom: r.nom.trim(), icone: r.icone ?? null };
+    let c = cleDe(r.nom), k = c, i = 2; while (pris.has(k)) k = c + "_" + i++;
+    pris.add(k); return { cle: k, nom: r.nom.trim(), icone: r.icone ?? null };
+  });
+  try { await rpc("partage_modifier_groupe", { p_code: code, p_ressources: liste }); await charger(); toast("Ressources enregistrées"); }
+  catch (e) { toast(e.message, true); }
+};
+$("#r-membres").onclick = async e => {
+  const l = e.target.closest("[data-id]"); if (!l) return;
+  const id = Number(l.dataset.id);
+  try {
+    if (e.target.closest("[data-bouger]")) {
+      const ids = G.membres.map(m => m.id), i = ids.indexOf(id), j = i + Number(e.target.closest("[data-bouger]").dataset.bouger);
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+      await rpc("partage_ordonner_membres", { p_code: code, p_membres: ids });
+    } else if (e.target.closest("[data-renommer]")) {
+      await rpc("partage_modifier_membre", { p_code: code, p_membre: id, p_nom: l.querySelector("[data-nom]").value.trim() });
+      toast("Membre renommé");
+    } else if (e.target.closest("[data-actif]")) {
+      await rpc("partage_modifier_membre", { p_code: code, p_membre: id, p_actif: e.target.closest("[data-actif]").dataset.actif === "1" });
+    } else return;
+    await charger();
+  } catch (err) { toast(err.message, true); }
+};
+$("#f-membre").onsubmit = async e => {
+  e.preventDefault();
+  try { await rpc("partage_ajouter_membre", { p_code: code, p_nom: $("#r-nouveau").value.trim() }); $("#r-nouveau").value = ""; await charger(); toast("Membre ajouté"); }
+  catch (err) { toast(err.message, true); }
+};
+$("#r-nom-ok").onclick = async () => {
+  try { await rpc("partage_modifier_groupe", { p_code: code, p_nom: $("#r-nom").value.trim() }); await charger(); toast("Groupe renommé"); }
+  catch (e) { toast(e.message, true); }
+};
+$("#r-oublier").onclick = () => {
+  ecrire("partage_groupes", lire("partage_groupes", []).filter(g => g.code !== code));
+  location.hash = ""; toast("Groupe retiré de cet appareil (le lien reste valable)");
+};
+document.addEventListener("click", async e => {
+  if (!e.target.matches("[data-copier]")) return;
+  try { await navigator.clipboard.writeText(lienGroupe(code)); toast("Lien copié ✔"); }
+  catch (err) { toast("Copie impossible : sélectionne le lien à la main", true); }
+});
+
+if (CONFIG.url.startsWith("__")) {
+  $("#e-texte").textContent = "Page non configurée (URL Supabase manquante)."; montrer("erreur");
+} else route();
+</script>
+</body>
+</html>
